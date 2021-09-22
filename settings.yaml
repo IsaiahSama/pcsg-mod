@@ -3,5 +3,11 @@
 constants:
   prefix: "p."
   key: "something"
+  owner_id: 493839592835907594
+
+non_cogs:
+  - "main.py"
+  - "database.py"
+  
 
 ...
