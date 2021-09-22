@@ -27,8 +27,8 @@ class Database:
             await db.execute("INSERT OR REPLACE INTO MuteTable (USER_ID, ROLE_IDS) VALUES (?, ?)", (user_id, ', '.join(str(rid) for rid in role_ids)))
             await db.commit()
 
-    async def get_muted_user(self, user_id:int) -> Row:
-        """Requests a muted user from the database.
+    async def get_and_remove_muted_user(self, user_id:int) -> Row:
+        """Requests a muted user from the database. Then removes them from the database
         
         Args:
             user_id (int): The id of the user to query
@@ -38,6 +38,10 @@ class Database:
 
         async with connect(self.name) as db:
             cursor = await db.execute("SELECT * FROM MuteTable WHERE USER_ID = (?)", (user_id,))
-            return await cursor.fetchall()
+            data = await cursor.fetchall()
+            if data:
+                await db.execute("DELETE FROM MuteTable WHERE USER_ID = (?)", (user_id, ))
+                await db.commit()
+            return data
 
 db = Database()

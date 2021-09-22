@@ -41,14 +41,27 @@ class Admin(Cog):
         
         await db.mute_user(member.id, [role.id for role in member.roles])
         await member.edit(roles=muted_role, reason=reason)
-        await ctx.send(f"{member} has been muted by {ctx.author}. Reason: {reason}")
+        await ctx.send(f"{member.mention} has been muted by {ctx.author}. Reason: {reason}")
         await asyncio.sleep(timeout * 60)
-        muted_member = await db.get_muted_user(member.id)
+        muted_member = await db.get_and_remove_muted_user(member.id)
         if muted_member:
             role_ids = [(int(role_id)) for role_id in muted_member[1].split(", ")]
             roles = [ctx.guild.get_role(role_id) for role_id in role_ids]
             await member.edit(roles=[role for role in roles if role])
+    
+    @command(name="Unmute", brief="Unmutes a muted user", help="Used to unmute someone that has been muted.", usage="@member")
+    @has_guild_permissions(manage_messages=True)
+    async def unmute(self, ctx:Context, member:discord.Member):
+        muted_member = await db.get_and_remove_muted_user(member.id)
+        if not muted_member:
+            await ctx.send(f"{member} is not muted.")
+            return False
 
+        role_ids = [(int(role_id)) for role_id in muted_member[1].split(", ")]
+        roles = [ctx.guild.get_role(role_id) for role_id in role_ids]
+        await member.edit(roles=[role for role in roles if role])
+        await ctx.send(f"{member.mention} has been unmuted.")
+        
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
