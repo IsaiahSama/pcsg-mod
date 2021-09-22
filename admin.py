@@ -62,6 +62,24 @@ class Admin(Cog):
         await member.edit(roles=[role for role in roles if role])
         await ctx.send(f"{member.mention} has been unmuted.")
         
+    paused_channels = {}
+    @command(name="Pause", brief="Prevents all users from speaking in the current channel", help="Stops activity from within the current channel", usage="time_in_minutes")
+    @has_guild_permissions(manage_messages=True, manage_channels=True)
+    async def pause(self, ctx: Context):
+        og_overwrites = ctx.channel.overwrites
+        self.paused_channels[ctx.channel.id] = og_overwrites
+        await ctx.channel.edit(overwrites=ctx.channel.overwrites.update({ctx.guild.default_role: PermissionOverwrite(send_messages=False)}))
+        await ctx.send("Silence!!!. Use unpause command to resume chat.")
+
+    @command(name="unpuase", brief="Unpauses a paused channel", help="Unfreezes the channel, so users may speak in the channel again")
+    @has_guild_permissions(manage_messages=True, manage_channels=True)
+    async def unpause(self, ctx:Context):
+        overwrites = self.paused_channels.get(ctx.channel.id)
+        if overwrites:
+            await ctx.channel.edit(overwrites=overwrites)
+            await ctx.send("Continue")
+            del self.paused_channels[ctx.channel.id]
+        await ctx.send("Not frozen.")
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
