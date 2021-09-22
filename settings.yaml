@@ -1,0 +1,7 @@
+---
+
+constants:
+  prefix: "p."
+  key: "something"
+
+...
