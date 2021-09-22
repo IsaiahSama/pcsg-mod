@@ -1,8 +1,9 @@
+import asyncio
 from discord.ext.commands import Cog, Bot, command, has_guild_permissions
 import discord
 from discord.ext.commands.context import Context
-from discord import Permissions
 from discord.permissions import PermissionOverwrite
+from database import db
 
 class Admin(Cog):
     def __init__(self, bot: Bot):
@@ -27,7 +28,7 @@ class Admin(Cog):
             await user.send(f"You have been banned from PCSG. Reason: {reason}")
         except:
             pass 
-        await ctx.guild.ban(user)
+        await ctx.guild.ban(user, reason=reason)
         await ctx.send(f"{user} has been banned by {ctx.author}. Reason: {reason}")
 
     @command(name="Mute", brief="Mutes a user from the server for a given time", help="Prevents a user from speaking in the server for a given duration.", usage="@member time_in_minutes reason")
@@ -38,8 +39,16 @@ class Admin(Cog):
             muted_role = await ctx.guild.create_role(name="E-Muted")
             [await channel.edit(overwrites=channel.overwrites.update({muted_role: PermissionOverwrite(send_messages=False)})) for channel in ctx.guild.text_channels]
         
-        await member.edit()
-        
+        await db.mute_user(member.id, [role.id for role in member.roles])
+        await member.edit(roles=muted_role, reason=reason)
+        await ctx.send(f"{member} has been muted by {ctx.author}. Reason: {reason}")
+        await asyncio.sleep(timeout * 60)
+        muted_member = await db.get_muted_user(member.id)
+        if muted_member:
+            role_ids = [(int(role_id)) for role_id in muted_member[1].split(", ")]
+            roles = [ctx.guild.get_role(role_id) for role_id in role_ids]
+            await member.edit(roles=[role for role in roles if role])
+
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
