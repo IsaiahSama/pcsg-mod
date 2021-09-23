@@ -120,7 +120,7 @@ class Admin(Cog):
         roles = []
         messages = []
         await msg.edit(content="Alright. Tell me the names of all the roles you want to add to this menu. Tell me them one by one. Tell me 'done' when you are done")
-        messages.append(msg)
+        messages.append(msg.id)
         while len(roles) <= 20:
             try:
                 role_name = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author, timeout=60)
@@ -129,12 +129,12 @@ class Admin(Cog):
                 return False
             if role_name.content.lower() == "done":
                 break
-            messages.append(msg)
+            messages.append(role_name.id)
             role = [role for role in ctx.guild.roles if role.name.lower() == role_name.content.lower()]
             approx = [role for role in ctx.guild.roles if role_name.content.lower() in role.name.lower()]
             if not role:
                 msg2 = await ctx.send(f"Sorry... No role exists by that name. I'm still listening to you though! Some roles close to that however are: {', '.join((role.name for role in approx))}")
-                messages.append(msg2)
+                messages.append(msg2.id)
                 continue
             roles.append(role[0])
             await role_name.add_reaction("✅")
@@ -144,7 +144,7 @@ class Admin(Cog):
             return False
         
         msg = await ctx.send(f"Alright. I'll be making a role-react menu using the following roles: {', '.join([role.name for role in roles])}. React with ✅, if that's fine.")
-        messages.append(msg)
+        messages.append(msg.id)
         try:
             r, _ = await self.bot.wait_for("reaction_add", check=lambda r, u: str(r.emoji) == "✅" and u == ctx.author, timeout=30)
         except asyncio.TimeoutError:
@@ -182,9 +182,12 @@ class Admin(Cog):
         [await react_msg.add_reaction(emoji) for emoji in emojis]
         await role_msg.edit(content="YAY... Final cleanup", delete_after=5)
         await asyncio.sleep(1)
-        [await msg.delete() for msg in messages]
-
-        
+        for message_id in messages:
+            try:
+                msg = await ctx.channel.fetch_message(message_id)
+                await msg.delete()
+            except:
+                print("Couldn't handle one...")
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
