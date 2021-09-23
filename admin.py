@@ -95,6 +95,14 @@ class Admin(Cog):
         if warn_logs:
             await warn_logs.send(f"{member} has been warned by {ctx.author}. Reason: {reason}")
 
+    @command(name="Warns", brief="Views number of warns on a user", help="Displays if a user has been warned, and the number of warns they have.", usage="@member")
+    async def warns(self, ctx:Context, member:discord.Member):
+        warned = await db.get_warned_user(member.id)
+        if not warned:
+            await ctx.send(f"{member} has no warns. They're good :D")
+        else:
+            await ctx.send(f"{member} has {member[1]} warns. >(")
+
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
     
