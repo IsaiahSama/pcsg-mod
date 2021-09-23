@@ -27,7 +27,8 @@ class Database:
             await db.execute("""CREATE TABLE IF NOT EXISTS RoleTable (
                 MESSAGE_ID INTEGER PRIMARY KEY,
                 EMOJI TEXT,
-                ROLE_ID INTEGER)
+                ROLE_ID INTEGER,
+                ROLE_NAME TEXT)
                 """)
 
             await db.commit()
@@ -181,9 +182,22 @@ class Database:
         react_roles = role_dict["REACT_ROLES"]
 
         for emoji, inner_dict in react_roles.items():
-            role_id = inner_dict['ID']
             async with connect(self.name) as db:
-                await db.execute("INSERT INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID) VALUES (?, ?, ?)", (message_id, emoji, role_id))
+                await db.execute("INSERT INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID, ROLE_NAME) VALUES (?, ?, ?)", (message_id, emoji, inner_dict['ID'], inner_dict['NAME']))
                 await db.commit()
+    
+    async def get_role_menu(self, message_id:int) -> Row:
+        """Retrieves a role menu via message_id
+        
+        Args:
+            message_id (int): The id of the message to check for.
+        
+        Returns:
+            Row | None"""
+        
+        async with connect(self.name) as db:
+            cursor = await db.execute("SELECT * FROM RoleTable WHERE MESSAGE_ID = (?)", (message_id, ))
+            results = await cursor.fetchall()
+            return results
 
 db = Database()

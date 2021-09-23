@@ -4,6 +4,7 @@ from discord.ext.commands import Cog, Bot
 from discord import Embed
 from discord.member import Member
 from discord.message import Message
+from discord.raw_models import RawReactionActionEvent
 from config import config
 from random import randint
 from time import ctime
@@ -99,7 +100,16 @@ class EventHandler(Cog):
         embed = self.handle_changed(before, after)
         if channel:
             await channel.send(embed=embed)
+
+    @Cog.listener()
+    async def on_raw_reaction_add(self, payload:RawReactionActionEvent):
+        await self.handle_reaction(payload)
+
+    @Cog.listener()
+    async def on_raw_reaction_remove(self, payload:RawReactionActionEvent):
+        await self.handle_reaction(payload)
     
+    # Functions
     async def handle_changed(self, before:Member, after:Member) -> Embed:
         """Checks to see what part of the Member was updated, and formats an Embed to suit
         
@@ -127,7 +137,6 @@ class EventHandler(Cog):
         embed.add_field(name="After:", value=getattr(after, changed))
         return embed
 
-    # Functions
     async def moderate_message(self, message:Message) -> bool:
         """Checks to see if a message contains any profanity
         
@@ -170,6 +179,37 @@ class EventHandler(Cog):
         await asyncio.sleep(60)
         self.on_exp_cooldown.remove(member.id)
          
+
+    async def handle_reaction(self, payload:RawReactionActionEvent):
+        """Handles reaction events, and adds/removes roles accoridingly
+        
+        Args:
+            payload (RawReactionActionEvent): The payload for the raw event"""
+        
+        # Role_menu will be a list of tuples. Format: (message_id, emoji, role_id, role_name)
+
+        if role_menu := await db.get_role_menu(payload.message_id):
+            if not payload.member:
+                return
+            guild = self.bot.get_guild(payload.guild_id)
+            emoji = str(payload.emoji)
+
+            role_option = [option for option in role_menu if option[1] == emoji]
+            if not role_option:
+                print(f"Could not find a role for {emoji}")
+                return False
+            
+            role_option = role_option[0]
+
+            role = guild.get_role(role_option[2])
+            if not role:
+                print(f"Could not find a role for {role_option[3]} any longer.")
+                return
+
+            if payload.event_type == "REACTION_ADD":
+                await payload.member.add_roles(role)
+            else:
+                await payload.member.remove_roles(role)
         
 
 def setup(bot: Bot):
