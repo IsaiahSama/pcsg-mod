@@ -14,6 +14,7 @@ channels:
 non_cogs:
   - "main.py"
   - "database.py"
+  - "config.py"
   
 profanity:
   - "shit"

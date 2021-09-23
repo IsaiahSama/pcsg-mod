@@ -1,9 +1,9 @@
-from discord.ext.commands import Cog, command, Bot
+from discord.ext.commands import Cog, Bot
 from discord.message import Message
-from main import settings
+from config import config
 
 class EventHandler(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot 
 
     # Event Handlers
@@ -28,7 +28,7 @@ class EventHandler(Cog):
         if "fuck" in content:
             return True
 
-        return True if [word for word in settings['profanity'] if word in content] else False
+        return True if [word for word in config['profanity'] if word in content] else False
         
 
 def setup(bot: Bot):
