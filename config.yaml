@@ -1,0 +1,26 @@
+---
+
+constants:
+  prefix: "p."
+  key: "something"
+  owner_id: 493839592835907594
+
+channels:
+  warn-logs: 861553807673524234
+  member-logs: 786016910668070952
+  message-logs: 785993210522107925
+  monitor-logs: 890407023471099974
+
+non_cogs:
+  - "main.py"
+  - "database.py"
+  
+profanity:
+  - "shit"
+  - "bitch"
+  - "dick"
+  - "pussy"
+  - "cunt"
+  - "ass"
+
+...
