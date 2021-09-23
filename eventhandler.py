@@ -1,7 +1,7 @@
 import asyncio
 from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
-from discord import Embed
+from discord import Embed, Activity, ActivityType
 from discord.member import Member
 from discord.message import Message
 from discord.raw_models import RawReactionActionEvent
@@ -15,6 +15,14 @@ class EventHandler(Cog):
         self.bot = bot 
 
     # Event Handlers
+    @Cog.listener()
+    async def on_ready(self):
+        print("PCSG MOD v2 IS UP AND READY!")
+        await self.bot.wait_until_ready()
+        activity = Activity(name=f"{config['constants']['prefix']}MOD POWA", type=ActivityType.playing)
+        await self.bot.change_presence(activity=activity)
+
+
     @Cog.listener()
     async def on_message(self, message:Message):
         if await self.moderate_message(message):
