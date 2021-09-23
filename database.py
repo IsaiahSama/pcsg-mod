@@ -13,9 +13,12 @@ class Database:
                 USER_ID INTEGER PRIMARY KEY,
                 ROLE_IDS TEXT
                 )""")
+
             await db.execute("""CREATE TABLE IF NOT EXISTS WarnTable(
                 USER_ID INTEGER PRIMARY KEY,
                 WARN_COUNT INTEGER)""")
+
+            await db.execute("CREATE TABLE IF NOT EXISTS MonitorTable(USER_ID INTEGER PRIMARY KEY);")
 
             await db.commit()
 
@@ -77,5 +80,39 @@ class Database:
         async with connect(self.name) as db:
             cursor = await db.execute("SELECT * FROM WarnTable WHERE USER_ID = (?)", (user_id, ))
             return await cursor.fetchall()
+
+    async def monitor(self, user_id:int) -> bool:
+        """Toggles whether a user is to be monitored or not
+        
+        Args:
+            user_id (int): An id of the user to monitor
+            
+        Returns:
+            bool: True if the user is now being monitored, False if they are no longer being monitored"""
+        
+        if await self.is_monitored(user_id):
+            async with connect(self.name) as db:
+                await db.execute("DELETE FROM MonitorTable WHERE USER_ID = (?)", (user_id, ))
+                await db.commit()
+                return False
+        else:
+            async with connect(self.name) as db:
+                await db.execute("INSERT OR REPLACE INTO MonitorTable USER_ID VALUES (?)", (user_id, ))
+                await db.commit()
+                return True
+
+    async def is_monitored(self, user_id:int) -> bool:
+        """Checks whether or not a user with a given id is being monitored
+        
+        Args:
+            user_id (int): The ID of the user to check.
+            
+        Return:
+            bool"""
+
+        async with connect(self.name) as db:
+            cursor = await db.execute("SELECT * FROM MonitorTable WHERE USER_ID = (?)", (user_id, ))
+            monitored = await cursor.fetchall()
+        return True if monitored else False
 
 db = Database()

@@ -5,6 +5,7 @@ from discord.message import Message
 from config import config
 from random import randint
 from time import ctime
+from database import db
 
 class EventHandler(Cog):
     def __init__(self, bot: Bot):
@@ -16,6 +17,11 @@ class EventHandler(Cog):
         if await self.moderate_message(message):
             await message.channel.send(f"{message.author.mention} watch your language!")
             await message.delete()
+        
+        if await db.is_monitored(message.author.id):
+            monitor = config['channels']['monitor-logs']
+            if monitor:
+                await monitor.send(f"{message.author} in {message.channel.mention}: {message.content}")
 
     @Cog.listener()
     async def on_message_delete(self, message:Message):

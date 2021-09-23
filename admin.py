@@ -103,6 +103,13 @@ class Admin(Cog):
         else:
             await ctx.send(f"{member} has {member[1]} warns. >(")
 
+    @command(name="monitor", brief="Toggle a message monitor on a user", help="Used to monitor any suspicious individuals and their activity in the server.", usage="@member")
+    async def monitor(self, ctx:Context, member:discord.Member):
+        if await db.monitor(member.id):
+            await ctx.send(f"Alright... I will begin monitoring {member}")
+        else:
+            await ctx.send(f"Fine. I will no longer monitor {member}")
+
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
     
