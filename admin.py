@@ -104,11 +104,87 @@ class Admin(Cog):
             await ctx.send(f"{member} has {member[1]} warns. >(")
 
     @command(name="monitor", brief="Toggle a message monitor on a user", help="Used to monitor any suspicious individuals and their activity in the server.", usage="@member")
+    @has_guild_permissions(manage_channels=True)
     async def monitor(self, ctx:Context, member:discord.Member):
         if await db.monitor(member.id):
             await ctx.send(f"Alright... I will begin monitoring {member}")
         else:
             await ctx.send(f"Fine. I will no longer monitor {member}")
+
+    @command(name="create_react_role", brief="Used to create a role reaction menu", help="Used to create a react role menu.")
+    @has_guild_permissions(manage_messages=True, manage_channels=True)
+    async def create_react_role(self, ctx:Context):
+        msg = await ctx.send("Hey!!! Alright, let's start this process shall we.")
+        await asyncio.sleep(1)
+        await msg.edit(content="Getting everything ready for you")
+        roles = []
+        messages = []
+        await msg.edit(content="Alright. Tell me the names of all the roles you want to add to this menu. Tell me them one by one. Tell me 'done' when you are done")
+        messages.append(msg)
+        while len(roles) <= 20:
+            try:
+                role_name = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author, timeout=60)
+            except asyncio.TimeoutError():
+                await ctx.send("Sheesh... took too long. BYE!")
+                return False
+            if role_name.content.lower() == "done":
+                break
+            messages.append(msg)
+            role = [role for role in ctx.guild.roles if role.name.lower() == role_name.content.lower()]
+            approx = [role for role in ctx.guild.roles if role_name.content.lower() in role.name.lower()]
+            if not role:
+                msg2 = await ctx.send(f"Sorry... No role exists by that name. I'm still listening to you though! Some roles close to that however are: {', '.join((role.name for role in approx))}")
+                messages.append(msg2)
+                continue
+            roles.append(role[0])
+            await role_name.add_reaction("✅")
+
+        if not roles:
+            await ctx.send("Sheesh. Another time then", delete_after=10)
+            return False
+        
+        msg = await ctx.send(f"Alright. I'll be making a role-react menu using the following roles: {', '.join([role.name for role in roles])}. React with ✅, if that's fine.")
+        messages.append(msg)
+        try:
+            r, _ = await self.bot.wait_for("reaction_add", check=lambda r, u: str(r.emoji) == "✅" and u == ctx.author, timeout=30)
+        except asyncio.TimeoutError:
+            await ctx.send("Eugh... too long.. BYE!!!", delete_after=10)
+            await msg.delete()
+            return
+        
+        await msg.edit(content="Brilliant. Now the real fun can begin.")
+        react_msg = await ctx.send("Final Output... Don't delete this...")
+        react_dict = {"MESSAGE_ID": react_msg.id, "REACT_ROLES": {}}
+        emojis = []
+        role_msg = await ctx.send("*blank*")
+        for role in roles:
+            await role_msg.edit(f"React with the emoji that you want to use for {role.name}")
+            try:
+                r, _ = await self.bot.wait_for("reaction_add", check=lambda _, u: u == ctx.author, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Eugh... taking too long. Clean up this chat yourself too :unamused: ", delete_after=10)
+                return False
+            
+            react_dict['REACT_ROLES'][str(r.emoji)] = {"NAME": role.name, "ID": role.id}
+            emojis.append(str(r.emoji))
+            
+        await role_msg.edit("Brilliant... Finalizing and cleaning up")
+        
+        # Set the role stuff into the database
+        await db.add_role_react(react_dict)
+
+        # Update the Message, and add the reactions.
+        output = "React below to get your role."
+        for emoji, inner_dict in react_dict['REACT_ROLES'].items():
+            output += f"\n{emoji}: {inner_dict['NAME']}"
+        
+        await react_msg.edit(content=output)
+        [await react_msg.add_reaction(emoji) for emoji in emojis]
+        await role_msg.edit("YAY... Final cleanup", delete_after=5)
+        await asyncio.sleep(2)
+        [await msg.delete() for msg in messages]
+
+        
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))

@@ -18,11 +18,17 @@ class Database:
                 USER_ID INTEGER PRIMARY KEY,
                 WARN_COUNT INTEGER)""")
 
-            await db.execute("CREATE TABLE IF NOT EXISTS MonitorTable(USER_ID INTEGER PRIMARY KEY);")
+            await db.execute("CREATE TABLE IF NOT EXISTS MonitorTable(USER_ID INTEGER PRIMARY KEY UNIQUE);")
 
             await db.execute("""CREATE TABLE IF NOT EXISTS LevelTable (
-                USER_ID INTEGER PRIMARY KEY,
+                USER_ID INTEGER PRIMARY KEY UNIQUE,
                 EXP INTEGER)""")
+
+            await db.execute("""CREATE TABLE IF NOT EXISTS RoleTable (
+                MESSAGE_ID INTEGER PRIMARY KEY,
+                EMOJI TEXT,
+                ROLE_ID INTEGER)
+                """)
 
             await db.commit()
 
@@ -153,5 +159,31 @@ class Database:
             user = await self.get_user(user_id)
         
         return user
+
+    async def add_role_react(self, role_dict:dict):
+        """Sets up the roles and their reactions into the database
+        
+        Args:
+            role_dict (dict): Dict containing the role menu."""
+
+        """Role_dict format:
+        {
+            MESSAGE_ID : int,
+            REACT_ROLES : {
+                EMOJI (str): {
+                    NAME: (str),
+                    ID: (int)
+                }
+            }
+        } """
+
+        message_id = role_dict['MESSAGE_ID']
+        react_roles = role_dict["REACT_ROLES"]
+
+        for emoji, inner_dict in react_roles.items():
+            role_id = inner_dict['ID']
+            async with connect(self.name) as db:
+                await db.execute("INSERT INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID) VALUES (?, ?, ?)", (message_id, emoji, role_id))
+                await db.commit()
 
 db = Database()
