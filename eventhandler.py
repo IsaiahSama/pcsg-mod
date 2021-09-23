@@ -1,5 +1,6 @@
 from discord.ext.commands import Cog, Bot
 from discord import Embed
+from discord.member import Member
 from discord.message import Message
 from config import config
 from random import randint
@@ -43,6 +44,39 @@ class EventHandler(Cog):
         if channel:
             await channel.send(embed=embed)
         
+    @Cog.listener()
+    async def on_member_update(self, before:Member, after:Member):
+        channel = config['channels']['member-logs']
+        embed = self.handle_changed(before, after)
+        if channel:
+            await channel.send(embed=embed)
+    
+    async def handle_changed(self, before:Member, after:Member) -> Embed:
+        """Checks to see what part of the Member was updated, and formats an Embed to suit
+        
+        Args:
+            before (Member): The member before the change
+            after (Member): The member after the change
+            
+        Returns:
+            discord.Embed()"""
+        
+        embed = Embed(title='Member Update', color=randint(0, 0xffffff))
+        if before.status != after.status:
+            changed = "status"
+        elif before.activity != after.activity:
+            changed = "activity"
+        elif before.nickname != after.nickname:
+            changed = "nickname"
+        elif before.roles != after.roles:
+            changed = "roles"
+        elif before.pending != after.pending:
+            changed = "pending"
+
+        embed.description = f"{before.name}'s {changed} has been changed"
+        embed.add_field(name="Before:", value=getattr(before, changed))
+        embed.add_field(name="After:", value=getattr(after, changed))
+        return embed
 
     # Functions
     async def moderate_message(self, message:Message) -> bool:
