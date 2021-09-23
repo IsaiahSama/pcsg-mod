@@ -4,6 +4,7 @@ import discord
 from discord.ext.commands.context import Context
 from discord.permissions import PermissionOverwrite
 from database import db
+from config import config
 
 class Admin(Cog):
     def __init__(self, bot: Bot):
@@ -80,6 +81,19 @@ class Admin(Cog):
             await ctx.send("Continue")
             del self.paused_channels[ctx.channel.id]
         await ctx.send("Not frozen.")
+
+    @command(name="Warn", brief="Issues a warning to a user", help="Adds +1 warn to a mentioned user. Max is 4", usage="@member reason")
+    @has_guild_permissions(kick_members=True)
+    async def warn(self, ctx:Context, member:discord.Member, reason:str):
+        warn_logs = ctx.guild.get_channel(config['channels']['warn-logs'])
+        await db.warn_user(member.id)
+        await ctx.send(f"{member.mention} has been warned by {ctx.author}. Reason: {reason}")
+        try:
+            await member.send(f"You have been warned by {ctx.author}. Reason: {reason}")
+        except:
+            pass
+        if warn_logs:
+            await warn_logs.send(f"{member} has been warned by {ctx.author}. Reason: {reason}")
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
