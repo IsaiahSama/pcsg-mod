@@ -9,5 +9,12 @@ non_cogs:
   - "main.py"
   - "database.py"
   
+profanity:
+  - "shit"
+  - "bitch"
+  - "dick"
+  - "pussy"
+  - "cunt"
+  - "ass"
 
 ...
