@@ -9,7 +9,7 @@ class Database:
     async def setup(self):
         """Sets up all tables for the Database"""
         async with connect(self.name) as db:
-            await db.execute("""CREATE TABLE IF NOT EXIST MuteTable(
+            await db.execute("""CREATE TABLE IF NOT EXISTS MuteTable(
                 USER_ID INTEGER PRIMARY KEY,
                 ROLE_IDS TEXT
                 )""")
