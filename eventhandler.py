@@ -21,6 +21,7 @@ class EventHandler(Cog):
         await self.bot.wait_until_ready()
         activity = Activity(name=f"{config['constants']['prefix']}MOD POWA", type=ActivityType.playing)
         await self.bot.change_presence(activity=activity)
+        await db.setup()
 
 
     @Cog.listener()
@@ -104,9 +105,9 @@ class EventHandler(Cog):
         
     @Cog.listener()
     async def on_member_update(self, before:Member, after:Member):
-        channel = config['channels']['member-logs']
+        channel = before.guild.get_channel(config['channels']['member-logs'])
         embed = await self.handle_changed(before, after)
-        if channel:
+        if channel and embed:
             await channel.send(embed=embed)
 
     @Cog.listener()
@@ -133,12 +134,13 @@ class EventHandler(Cog):
             changed = "status"
         elif before.activity != after.activity:
             changed = "activity"
-        elif before.nickname != after.nickname:
+        elif before.nick != after.nick:
             changed = "nickname"
         elif before.roles != after.roles:
             changed = "roles"
         elif before.pending != after.pending:
             changed = "pending"
+        else: return False
 
         embed.description = f"{before.name}'s {changed} has been changed"
         embed.add_field(name="Before:", value=getattr(before, changed))
@@ -199,9 +201,12 @@ class EventHandler(Cog):
         if role_menu := await db.get_role_menu(payload.message_id):
             if not payload.member:
                 return
+            print(role_menu)
+            role_menu = role_menu[1:]
             guild = self.bot.get_guild(payload.guild_id)
             emoji = str(payload.emoji)
 
+            print(role_menu)
             role_option = [option for option in role_menu if option[1] == emoji]
             if not role_option:
                 print(f"Could not find a role for {emoji}")

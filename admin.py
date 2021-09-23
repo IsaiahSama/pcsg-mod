@@ -158,7 +158,7 @@ class Admin(Cog):
         emojis = []
         role_msg = await ctx.send("*blank*")
         for role in roles:
-            await role_msg.edit(f"React with the emoji that you want to use for {role.name}")
+            await role_msg.edit(content=f"React with the emoji that you want to use for {role.name}")
             try:
                 r, _ = await self.bot.wait_for("reaction_add", check=lambda _, u: u == ctx.author, timeout=60)
             except asyncio.TimeoutError:
@@ -168,7 +168,7 @@ class Admin(Cog):
             react_dict['REACT_ROLES'][str(r.emoji)] = {"NAME": role.name, "ID": role.id}
             emojis.append(str(r.emoji))
             
-        await role_msg.edit("Brilliant... Finalizing and cleaning up")
+        await role_msg.edit(content="Brilliant... Finalizing and cleaning up")
         
         # Set the role stuff into the database
         await db.add_role_react(react_dict)
@@ -180,8 +180,8 @@ class Admin(Cog):
         
         await react_msg.edit(content=output)
         [await react_msg.add_reaction(emoji) for emoji in emojis]
-        await role_msg.edit("YAY... Final cleanup", delete_after=5)
-        await asyncio.sleep(2)
+        await role_msg.edit(content="YAY... Final cleanup", delete_after=5)
+        await asyncio.sleep(1)
         [await msg.delete() for msg in messages]
 
         

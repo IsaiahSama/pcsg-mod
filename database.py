@@ -25,7 +25,8 @@ class Database:
                 EXP INTEGER)""")
 
             await db.execute("""CREATE TABLE IF NOT EXISTS RoleTable (
-                MESSAGE_ID INTEGER PRIMARY KEY,
+                ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+                MESSAGE_ID INTEGER,
                 EMOJI TEXT,
                 ROLE_ID INTEGER,
                 ROLE_NAME TEXT)
@@ -183,7 +184,7 @@ class Database:
 
         for emoji, inner_dict in react_roles.items():
             async with connect(self.name) as db:
-                await db.execute("INSERT INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID, ROLE_NAME) VALUES (?, ?, ?)", (message_id, emoji, inner_dict['ID'], inner_dict['NAME']))
+                await db.execute("INSERT OR REPLACE INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID, ROLE_NAME) VALUES (?, ?, ?, ?)", (message_id, emoji, inner_dict['ID'], inner_dict['NAME']))
                 await db.commit()
     
     async def get_role_menu(self, message_id:int) -> Row:
