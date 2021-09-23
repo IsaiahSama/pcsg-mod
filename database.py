@@ -20,6 +20,10 @@ class Database:
 
             await db.execute("CREATE TABLE IF NOT EXISTS MonitorTable(USER_ID INTEGER PRIMARY KEY);")
 
+            await db.execute("""CREATE TABLE IF NOT EXISTS LevelTable (
+                USER_ID INTEGER PRIMARY KEY,
+                EXP INTEGER)""")
+
             await db.commit()
 
     async def mute_user(self, user_id:int, role_ids:list):
@@ -79,7 +83,7 @@ class Database:
 
         async with connect(self.name) as db:
             cursor = await db.execute("SELECT * FROM WarnTable WHERE USER_ID = (?)", (user_id, ))
-            return await cursor.fetchall()
+            return await cursor.fetchone()
 
     async def monitor(self, user_id:int) -> bool:
         """Toggles whether a user is to be monitored or not
@@ -114,5 +118,40 @@ class Database:
             cursor = await db.execute("SELECT * FROM MonitorTable WHERE USER_ID = (?)", (user_id, ))
             monitored = await cursor.fetchall()
         return True if monitored else False
+
+    async def get_user(self, user_id:int) -> Row:
+        """Queries the database for a USER with Exp.
+        
+        Args:
+            user_id (int): The ID of the user to query
+            
+        Returns:
+            Row | None"""
+
+        async with connect(self.name) as db:
+            cursor = await db.execute("SELECT * FROM LevelTable WHERE USER_ID = (?)", (user_id, ))
+            return await cursor.fetchone()
+
+    async def add_exp_to_user(self, user_id: int):
+        """Adds exp to a user, or creates the user anew.
+        
+        Args:
+            user_id (int): The ID of the user to work on"""
+
+        if user := await self.get_user(user_id):
+            user_update = list(user)
+            user_update[1] += 2
+            to_add = tuple(user_update)
+        else:
+            to_add = (user_id, 2)
+
+        async with connect(self.name) as db:
+            await db.execute("INSERT OR REPLACE INTO LevelTable (USER_ID, EXP) VALUES (?, ?)", to_add)
+            await db.commit()
+        
+        if not user:
+            user = await self.get_user(user_id)
+        
+        return user
 
 db = Database()

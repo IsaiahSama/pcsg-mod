@@ -1,3 +1,5 @@
+import asyncio
+from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
 from discord import Embed
 from discord.member import Member
@@ -22,6 +24,8 @@ class EventHandler(Cog):
             monitor = config['channels']['monitor-logs']
             if monitor:
                 await monitor.send(f"{message.author} in {message.channel.mention}: {message.content}")
+
+        await self.handle_exp_gain(message.channel, message.author)
 
     @Cog.listener()
     async def on_message_delete(self, message:Message):
@@ -139,6 +143,33 @@ class EventHandler(Cog):
             return True
 
         return True if [word for word in config['profanity'] if word in content] else False
+
+    # List of member ids that are on cooldown
+    on_exp_cooldown = []
+    async def handle_exp_gain(self, channel:TextChannel, member:Member):
+        """Handles the gain of exp for members
+        
+        Args:
+            member (Member): The member to apply the exp change to."""
+        
+        if member.id in self.on_exp_cooldown: return
+        
+        user = await db.add_exp_to_user(member.id)
+        if user:
+            if user[1] % 20 == 0 and user[1] > 0:
+                try:
+                    role_id = config['level-roles'][user[1] // 20]
+                    role = await channel.guild.get_role(role_id)
+                    if role:
+                        await member.add_roles(role)
+                        await channel.send(f"Congrats to {member.mention} for achieving the {role.name} role.")
+
+                except IndexError:
+                    await channel.send("Ou... you're already as high level as can be")
+        self.on_exp_cooldown.append(member.id)
+        await asyncio.sleep(60)
+        self.on_exp_cooldown.remove(member.id)
+         
         
 
 def setup(bot: Bot):
