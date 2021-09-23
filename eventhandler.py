@@ -4,6 +4,7 @@ from discord.member import Member
 from discord.message import Message
 from config import config
 from random import randint
+from time import ctime
 
 class EventHandler(Cog):
     def __init__(self, bot: Bot):
@@ -43,6 +44,44 @@ class EventHandler(Cog):
         embed.add_field(name="Jump URL", value=after.jump_url)
         if channel:
             await channel.send(embed=embed)
+
+    @Cog.listener()
+    async def on_member_join(self, member:Member):
+        welcome = member.guild.get_channel(config['channels']['welcome'])
+        join = member.guild.get_channel(config['channels']['join-logs'])
+
+        embed = Embed(title="!!!", description=f"{member.mention} has just joined the server", color=randint(0, 0xffffff))
+        embed.add_field(name="Account Creation Date", value=member.created_at.strftime("%d/%m/%y"))
+        embed.add_field(name="Joined at", value=ctime())
+
+        family_role = member.guild.get_role(config['roles']['family'])
+
+        if family_role:
+            await member.add_roles(family_role)
+        else:
+            print("No family role was found")
+
+        if join:
+            await join.send(embed=embed)
+        if welcome:
+            await welcome.send(config['welcome_message'].format(member.mention, sum(not user.bot for user in member.guild.members)))
+            await welcome.send("https://cdn.discordapp.com/attachments/813888001775370320/831305455237988402/WELCOME_TO_STUDY_GOALS_E-SCHOOL_4.gif")
+
+    @Cog.listener()
+    async def on_member_remove(self, member:Member):
+        join = member.guild.get_channel(config['channels']['join-logs'])
+
+        embed = Embed(title="'-'", description=f"{member} has just left the server", color=randint(0, 0xffffff))
+        if join:
+            await join.send(embed=embed)
+
+    @Cog.listener()
+    async def on_member_ban(self, member:Member):
+        join = member.guild.get_channel(config['channels']['join-logs'])
+
+        embed = Embed(title="BANNED!!!", description=f"{member} with id {member.id} has been banned.")
+        if join:
+            await join.send(embed=embed)
         
     @Cog.listener()
     async def on_member_update(self, before:Member, after:Member):

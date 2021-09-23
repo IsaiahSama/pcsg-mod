@@ -10,6 +10,11 @@ channels:
   member-logs: 786016910668070952
   message-logs: 785993210522107925
   monitor-logs: 890407023471099974
+  join-logs: 786016910668070952
+  welcome: 700214669003980801
+
+roles:
+  family: 755633133600112651
 
 non_cogs:
   - "main.py"
@@ -23,5 +28,7 @@ profanity:
   - "pussy"
   - "cunt"
   - "ass"
+
+welcome_message: "Welcome {0} to the <:PCSGLETTERSWITHOUTBACKGROUND:828392100729978900> Family! <a:catholdheart:830938992081371157> You're the **{1}th Family Member <:holdheart:830939097518178375>**\nThank You for joining **The Study-Goals' E-School <a:movingstar:830939250513674311>**\n\nWe look forward to studying with you, Newbie E-Schooler! <a:party:830939382944628766>"
 
 ...
