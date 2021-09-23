@@ -105,7 +105,7 @@ class EventHandler(Cog):
     @Cog.listener()
     async def on_member_update(self, before:Member, after:Member):
         channel = config['channels']['member-logs']
-        embed = self.handle_changed(before, after)
+        embed = await self.handle_changed(before, after)
         if channel:
             await channel.send(embed=embed)
 
