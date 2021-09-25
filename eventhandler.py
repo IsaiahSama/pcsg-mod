@@ -178,7 +178,7 @@ class EventHandler(Cog):
             if user[1] % 20 == 0 and user[1] > 0:
                 try:
                     role_id = config['level-roles'][user[1] // 20]
-                    role = await channel.guild.get_role(role_id)
+                    role = channel.guild.get_role(role_id)
                     if role:
                         await member.add_roles(role)
                         await channel.send(f"Congrats to {member.mention} for achieving the {role.name} role.")
@@ -196,23 +196,23 @@ class EventHandler(Cog):
         Args:
             payload (RawReactionActionEvent): The payload for the raw event"""
         
-        # Role_menu will be a list of tuples. Format: (message_id, emoji, role_id, role_name)
-
+        # Role_menu will be a list of tuples. Format: (id, message_id, emoji, role_id, role_name)
         if role_menu := await db.get_role_menu(payload.message_id):
-            if not payload.member:
-                return
-            print(role_menu)
-            role_menu = role_menu[1:]
             guild = self.bot.get_guild(payload.guild_id)
+            member = payload.member
+            if not member:
+                member = guild.get_member(payload.user_id)
+                if not member:
+                    return
+
             emoji = str(payload.emoji)
 
-            print(role_menu)
-            role_option = [option for option in role_menu if option[1] == emoji]
+            role_option = [option for option in role_menu if option[2] == emoji]
             if not role_option:
                 print(f"Could not find a role for {emoji}")
                 return False
-            
-            role_option = role_option[0]
+
+            role_option = role_option[0][1:]
 
             role = guild.get_role(role_option[2])
             if not role:
@@ -220,9 +220,9 @@ class EventHandler(Cog):
                 return
 
             if payload.event_type == "REACTION_ADD":
-                await payload.member.add_roles(role)
+                await member.add_roles(role)
             else:
-                await payload.member.remove_roles(role)
+                await member.remove_roles(role)
         
 
 def setup(bot: Bot):
