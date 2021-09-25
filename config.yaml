@@ -5,6 +5,9 @@ constants:
   key: "NzYzMDU0MTAzNTkxOTExNDc0.X3yHgw.wNfZZyzhTqqhHQdzwnWkNkkYCYI"
   owner_id: 493839592835907594
 
+guild_ids: 
+  - 693608235835326464
+  
 channels:
   warn-logs: 861553807673524234
   member-logs: 786016910668070952
