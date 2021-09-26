@@ -12,13 +12,13 @@ class Utils(Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(name="portal", description="Creates a link to another channel.", guild_ids=config['guild_ids'], 
-    options=(create_option(name="channel", description="Provides a link to the selected channel", option_type=TextChannel, required=True)))
+    options=[create_option(name="channel", description="Provides a link to the selected channel", option_type=TextChannel, required=True)])
     async def portal(self, ctx:SlashContext, channel:TextChannel):
         await ctx.send(channel.mention)
 
-    @cog_ext.cog_slash(name="rank", description="Displays your rank based on level.", guild_ids=config['guild_ids'], options=(
+    @cog_ext.cog_slash(name="rank", description="Displays your rank based on level.", guild_ids=config['guild_ids'], options=[
         create_option(
-        name="member", description="Optional: The person who's rank you want to check", option_type=Member, required=False)))
+        name="member", description="Optional: The person who's rank you want to check", option_type=Member, required=False)])
     async def rank(self, ctx:SlashContext, member:Member=None):
         target = member or ctx.author
         all_users = await db.query_all_users()
