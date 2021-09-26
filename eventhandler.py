@@ -2,7 +2,7 @@ import asyncio
 from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
 from discord import Embed, Activity, ActivityType
-from discord.member import Member
+from discord.member import Member, VoiceState
 from discord.message import Message
 from discord.raw_models import RawReactionActionEvent
 from config import config
@@ -86,6 +86,8 @@ class EventHandler(Cog):
         if welcome:
             await welcome.send(config['welcome_message'].format(member.mention, sum(not user.bot for user in member.guild.members)))
             await welcome.send("https://cdn.discordapp.com/attachments/813888001775370320/831305455237988402/WELCOME_TO_STUDY_GOALS_E-SCHOOL_4.gif")
+        
+        await self.update_member_count(member)
 
     @Cog.listener()
     async def on_member_remove(self, member:Member):
@@ -94,6 +96,8 @@ class EventHandler(Cog):
         embed = Embed(title="'-'", description=f"{member} has just left the server", color=randint(0, 0xffffff))
         if join:
             await join.send(embed=embed)
+
+        await self.update_member_count(member)
 
     @Cog.listener()
     async def on_member_ban(self, member:Member):
@@ -109,6 +113,12 @@ class EventHandler(Cog):
         embed = await self.handle_changed(before, after)
         if channel and embed:
             await channel.send(embed=embed)
+    
+    @Cog.listener()
+    async def on_voice_state_update(self, member:Member, before:VoiceState, after:VoiceState):
+        vc_member_count = member.guild.get_channel(config['channels']['vc-count'])
+        if vc_member_count:
+            await vc_member_count.edit(name=f"{vc_member_count.name.split(': ')[0]}: {sum(len(vc2.members) for vc2 in [vc for vc in member.guild.voice_channels if vc.members])}")
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload:RawReactionActionEvent):
@@ -222,6 +232,18 @@ class EventHandler(Cog):
             else:
                 await member.remove_roles(role)
         
+    async def update_member_count(self, member:Member):
+        """Updates the member count vc
+        
+        Args:
+            member (Member): The member"""
+        member_count_channel = member.guild.get_channel(config['channels']['member-count'])
+        if member_count_channel:
+            name = member_count_channel.name.split(": ")[0]
+            try:
+                await member_count_channel.edit(name=f"{name}: {sum(not user.bot for user in member.guild.members)}")
+            except:
+                pass
 
 def setup(bot: Bot):
     bot.add_cog(EventHandler(bot))
