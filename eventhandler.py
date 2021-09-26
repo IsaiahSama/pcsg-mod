@@ -22,7 +22,6 @@ class EventHandler(Cog):
         activity = Activity(name=f"{config['constants']['prefix']}MOD POWA", type=ActivityType.playing)
         await self.bot.change_presence(activity=activity)
         await db.setup()
-        await self.bot.slash.sync_all_commands()
 
 
     @Cog.listener()
@@ -144,8 +143,8 @@ class EventHandler(Cog):
         else: return False
 
         embed.description = f"{before.name}'s {changed} has been changed"
-        embed.add_field(name="Before:", value=getattr(before, changed))
-        embed.add_field(name="After:", value=getattr(after, changed))
+        embed.add_field(name="Before:", value=getattr(before, changed)[:1000])
+        embed.add_field(name="After:", value=getattr(after, changed)[:1000])
         return embed
 
     async def moderate_message(self, message:Message) -> bool:
