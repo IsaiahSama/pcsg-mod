@@ -17,11 +17,12 @@ class EventHandler(Cog):
     # Event Handlers
     @Cog.listener()
     async def on_ready(self):
-        print("PCSG MOD v2 IS UP AND READY!")
         await self.bot.wait_until_ready()
+        print("PCSG MOD v2 IS UP AND READY!")
         activity = Activity(name=f"{config['constants']['prefix']}MOD POWA", type=ActivityType.playing)
         await self.bot.change_presence(activity=activity)
         await db.setup()
+        await self.bot.slash.sync_all_commands()
 
 
     @Cog.listener()
