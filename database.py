@@ -1,4 +1,5 @@
 from sqlite3.dbapi2 import Row
+from typing import Union
 from aiosqlite import connect
 
 class Database:
@@ -45,7 +46,7 @@ class Database:
             await db.execute("INSERT OR REPLACE INTO MuteTable (USER_ID, ROLE_IDS) VALUES (?, ?)", (user_id, ', '.join(str(rid) for rid in role_ids)))
             await db.commit()
 
-    async def get_and_remove_muted_user(self, user_id:int) -> Row:
+    async def get_and_remove_muted_user(self, user_id:int) -> Union[Row, list]:
         """Requests a muted user from the database. Then removes them from the database
         
         Args:
@@ -127,7 +128,7 @@ class Database:
             monitored = await cursor.fetchall()
         return True if monitored else False
 
-    async def get_user(self, user_id:int) -> Row:
+    async def get_user(self, user_id:int) -> Union[Row, list]:
         """Queries the database for a USER with Exp.
         
         Args:
@@ -161,6 +162,15 @@ class Database:
             user = await self.get_user(user_id)
         
         return user
+    
+    async def query_all_users(self) -> Union[list, Row]:
+        """Queries all users that have EXP from the database
+        
+        Returns:
+            list| Row"""
+        async with connect(self.name) as db:
+            cursor = await db.execute("SELECT * FROM LevelTable")
+            return await cursor.fetchall()
 
     async def add_role_react(self, role_dict:dict):
         """Sets up the roles and their reactions into the database
@@ -187,7 +197,7 @@ class Database:
                 await db.execute("INSERT OR REPLACE INTO RoleTable (MESSAGE_ID, EMOJI, ROLE_ID, ROLE_NAME) VALUES (?, ?, ?, ?)", (message_id, emoji, inner_dict['ID'], inner_dict['NAME']))
                 await db.commit()
     
-    async def get_role_menu(self, message_id:int) -> Row:
+    async def get_role_menu(self, message_id:int) -> Union[Row, list, None]:
         """Retrieves a role menu via message_id
         
         Args:
