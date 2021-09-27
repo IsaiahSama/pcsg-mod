@@ -124,8 +124,14 @@ class Admin(Cog):
         while len(roles) < 20:
             try:
                 role_name = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author, timeout=60)
-            except asyncio.TimeoutError():
+            except asyncio.TimeoutError:
                 await ctx.send("Sheesh... took too long. BYE!")
+                for message_id in messages:
+                    try:
+                        msg = await ctx.channel.fetch_message(message_id)
+                        await msg.delete()
+                    except:
+                        print("Couldn't handle one...")
                 return False
 
             if role_name.content.lower() == "done":
