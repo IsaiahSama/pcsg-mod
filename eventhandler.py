@@ -149,7 +149,7 @@ class EventHandler(Cog):
         if before.status != after.status:
             changed = "status"
         elif before.nick != after.nick:
-            changed = "nickname"
+            changed = "nick"
         elif before.roles != after.roles:
             changed = "roles"
         elif before.pending != after.pending:
