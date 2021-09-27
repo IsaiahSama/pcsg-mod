@@ -128,6 +128,7 @@ class Admin(Cog):
                 await ctx.send("Sheesh... took too long. BYE!")
                 return False
             if role_name.content.lower() == "done":
+                messages.append(role_name.id)
                 break
             messages.append(role_name.id)
             role = [role for role in ctx.guild.roles if role.name.lower() == role_name.content.lower()]
@@ -144,6 +145,7 @@ class Admin(Cog):
             return False
         
         msg = await ctx.send(f"Alright. I'll be making a role-react menu using the following roles: {', '.join([role.name for role in roles])}. React with ✅, if that's fine.")
+        await msg.add_reaction("✅")
         messages.append(msg.id)
         try:
             r, _ = await self.bot.wait_for("reaction_add", check=lambda r, u: str(r.emoji) == "✅" and u == ctx.author, timeout=30)
@@ -188,6 +190,7 @@ class Admin(Cog):
                 await msg.delete()
             except:
                 print("Couldn't handle one...")
+        await ctx.message.delete()
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
