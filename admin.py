@@ -119,7 +119,7 @@ class Admin(Cog):
         await msg.edit(content="Getting everything ready for you")
         roles = []
         messages = []
-        await msg.edit(content="Alright. Tell me the names of all the roles you want to add to this menu. Tell me them one by one. Tell me 'done' when you are done")
+        await msg.edit(content="Alright. Tell me the names of all the roles you want to add to this menu. Tell me them one by one. Tell me 'done' when you are done or 'cancel' to cancel")
         messages.append(msg.id)
         while len(roles) <= 20:
             try:
@@ -127,21 +127,40 @@ class Admin(Cog):
             except asyncio.TimeoutError():
                 await ctx.send("Sheesh... took too long. BYE!")
                 return False
+
             if role_name.content.lower() == "done":
                 messages.append(role_name.id)
                 break
+
+            if role_name.content.lower() == "cancel":
+                for message_id in messages:
+                    try:
+                        msg = await ctx.channel.fetch_message(message_id)
+                        await msg.delete()
+                    except:
+                        print("Couldn't handle one...")
+                return False
+
             messages.append(role_name.id)
             role = [role for role in ctx.guild.roles if role.name.lower() == role_name.content.lower()]
             approx = [role for role in ctx.guild.roles if role_name.content.lower() in role.name.lower()]
+
             if not role:
                 msg2 = await ctx.send(f"Sorry... No role exists by that name. I'm still listening to you though! Some roles close to that however are: {', '.join((role.name for role in approx))}")
                 messages.append(msg2.id)
                 continue
+
             roles.append(role[0])
             await role_name.add_reaction("✅")
 
         if not roles:
             await ctx.send("Sheesh. Another time then", delete_after=10)
+            for message_id in messages:
+                try:
+                    msg = await ctx.channel.fetch_message(message_id)
+                    await msg.delete()
+                except:
+                    print("Couldn't handle one...")
             return False
         
         msg = await ctx.send(f"Alright. I'll be making a role-react menu using the following roles: {', '.join([role.name for role in roles])}. React with ✅, if that's fine.")
@@ -152,6 +171,12 @@ class Admin(Cog):
         except asyncio.TimeoutError:
             await ctx.send("Eugh... too long.. BYE!!!", delete_after=10)
             await msg.delete()
+            for message_id in messages:
+                try:
+                    msg = await ctx.channel.fetch_message(message_id)
+                    await msg.delete()
+                except:
+                    print("Couldn't handle one...")
             return
         
         await msg.edit(content="Brilliant. Now the real fun can begin.")
@@ -165,6 +190,14 @@ class Admin(Cog):
                 r, _ = await self.bot.wait_for("reaction_add", check=lambda _, u: u == ctx.author, timeout=60)
             except asyncio.TimeoutError:
                 await ctx.send("Eugh... taking too long. Clean up this chat yourself too :unamused: ", delete_after=10)
+                await asyncio.sleep(5)
+                await ctx.send("Or that's how we did things...", delete_after=5)
+                for message_id in messages:
+                    try:
+                        msg = await ctx.channel.fetch_message(message_id)
+                        await msg.delete()
+                    except:
+                        print("Couldn't handle one...")
                 return False
             
             react_dict['REACT_ROLES'][str(r.emoji)] = {"NAME": role.name, "ID": role.id}
