@@ -178,7 +178,7 @@ class Admin(Cog):
         # Update the Message, and add the reactions.
         output = "React below to get your role."
         for emoji, inner_dict in react_dict['REACT_ROLES'].items():
-            output += f"\n{emoji}: {inner_dict['NAME']}"
+            output += f"\n\n{emoji}: {inner_dict['NAME']}"
         
         await react_msg.edit(content=output)
         [await react_msg.add_reaction(emoji) for emoji in emojis]
