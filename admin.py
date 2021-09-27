@@ -112,7 +112,7 @@ class Admin(Cog):
             await ctx.send(f"Fine. I will no longer monitor {member}")
 
     @command(name="create_react_role", brief="Used to create a role reaction menu", help="Used to create a react role menu.")
-    @has_guild_permissions(manage_messages=True, manage_channels=True)
+    @has_guild_permissions(manage_messages=True, manage_channels=True, manage_roles=True)
     async def create_react_role(self, ctx:Context):
         msg = await ctx.send("Hey!!! Alright, let's start this process shall we.")
         await asyncio.sleep(1)
@@ -178,7 +178,7 @@ class Admin(Cog):
         # Update the Message, and add the reactions.
         output = "React below to get your role."
         for emoji, inner_dict in react_dict['REACT_ROLES'].items():
-            output += f"\n\n{emoji}: {inner_dict['NAME']}"
+            output += f"\n\n{emoji}: `{inner_dict['NAME'].upper()}`"
         
         await react_msg.edit(content=output)
         [await react_msg.add_reaction(emoji) for emoji in emojis]
