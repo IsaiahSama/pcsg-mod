@@ -183,7 +183,7 @@ class EventHandler(Cog):
         
         user = await db.add_exp_to_user(member.id)
         if user:
-            if user[1] % 20 == 0 and user[1] > 0:
+            if user[1] % 50 == 0 and user[1] > 0:
                 try:
                     role_id = config['level-roles'][user[1] // 20]
                     role = channel.guild.get_role(role_id)
