@@ -36,7 +36,7 @@ class Utils(Cog):
     @cog_ext.cog_slash(name="top", description="Displays the 5 most active users.", guild_ids=config['guild_ids'])
     async def top(self, ctx:SlashContext):
         all_users = await db.query_all_users()
-        all_users.sort(key=lambda x: x[1])
+        all_users.sort(key=lambda x: x[1], reverse=True)
         embed = Embed(title="SHowing top 5 most active", color=randint(0, 0xffffff))
         for user in all_users[:5]:
             embed.add_field(name="Name:", value=ctx.guild.get_member(user[0]) or "Unknown User")
