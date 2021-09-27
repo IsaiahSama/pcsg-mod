@@ -35,12 +35,12 @@ non_cogs:
   - "config.py"
   
 profanity:
-  - "shit "
+  - " shit "
   - "bitch"
   - "dick"
   - "pussy"
   - "cunt"
-  - "ass "
+  - " ass "
 
 welcome_message: "Welcome {0} to the <:PCSGLETTERSWITHOUTBACKGROUND:828392100729978900> Family! <a:catholdheart:830938992081371157> You're the **{1}th Family Member <:holdheart:830939097518178375>**\nThank You for joining **The Study-Goals' E-School <a:movingstar:830939250513674311>**\n\nWe look forward to studying with you, Newbie E-Schooler! <a:party:830939382944628766>"
 
