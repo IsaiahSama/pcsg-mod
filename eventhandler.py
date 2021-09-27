@@ -30,6 +30,7 @@ class EventHandler(Cog):
             await message.channel.send(f"{message.author.mention} watch your language!")
             await message.delete()
         
+        if message.author.bot: return False
         if await db.is_monitored(message.author.id):
             monitor = config['channels']['monitor-logs']
             if monitor:
