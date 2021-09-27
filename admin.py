@@ -121,7 +121,7 @@ class Admin(Cog):
         messages = []
         await msg.edit(content="Alright. Tell me the names of all the roles you want to add to this menu. Tell me them one by one. Tell me 'done' when you are done or 'cancel' to cancel")
         messages.append(msg.id)
-        while len(roles) <= 20:
+        while len(roles) < 20:
             try:
                 role_name = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author, timeout=60)
             except asyncio.TimeoutError():
