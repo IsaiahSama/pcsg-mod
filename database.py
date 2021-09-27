@@ -149,10 +149,10 @@ class Database:
 
         if user := await self.get_user(user_id):
             user_update = list(user)
-            user_update[1] += 2
+            user_update[1] += 1
             to_add = tuple(user_update)
         else:
-            to_add = (user_id, 2)
+            to_add = (user_id, 1)
 
         async with connect(self.name) as db:
             await db.execute("INSERT OR REPLACE INTO LevelTable (USER_ID, EXP) VALUES (?, ?)", to_add)
