@@ -36,6 +36,11 @@ class EventHandler(Cog):
                 await monitor.send(f"{message.author} in {message.channel.mention}: {message.content}")
 
         await self.handle_exp_gain(message.channel, message.author)
+        if message.channel.id == config['channels']['name-channel']:
+            try:
+                await message.author.edit(nick=message.content)
+            except:
+                await message.channel.send("No, that name is invalid.")
 
     @Cog.listener()
     async def on_message_delete(self, message:Message):
