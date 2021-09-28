@@ -40,6 +40,10 @@ class EventHandler(Cog):
         if message.channel.id == config['channels']['name-channel']:
             try:
                 await message.author.edit(nick=message.content)
+                try:
+                    await message.channel.send(f"Brilliant. Now head over to {message.guild.get_channel(config['channels']['name-channel']).mention} to select your country.")
+                except:
+                    pass
             except:
                 await message.channel.send("No, that name is invalid.")
 
@@ -75,6 +79,8 @@ class EventHandler(Cog):
     async def on_member_join(self, member:Member):
         welcome = member.guild.get_channel(config['channels']['welcome'])
         join = member.guild.get_channel(config['channels']['join-logs'])
+        name_channel = member.guild.get_channel(config['channels']['name-channel'])
+
 
         embed = Embed(title="!!!", description=f"{member.mention} has just joined the server", color=randint(0, 0xffffff))
         embed.add_field(name="Account Creation Date", value=member.created_at.strftime("%d/%m/%y"))
@@ -92,7 +98,8 @@ class EventHandler(Cog):
         if welcome:
             await welcome.send(config['welcome_message'].format(member.mention, sum(not user.bot for user in member.guild.members)))
             await welcome.send("https://cdn.discordapp.com/attachments/813888001775370320/831305455237988402/WELCOME_TO_STUDY_GOALS_E-SCHOOL_4.gif")
-        
+        if name_channel:
+            await name_channel.send(f"Hey {member.mention}, what is your name?")
         await self.update_member_count(member)
 
     @Cog.listener()
