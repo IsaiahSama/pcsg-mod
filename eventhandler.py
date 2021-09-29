@@ -41,7 +41,7 @@ class EventHandler(Cog):
             try:
                 await message.author.edit(nick=message.content)
                 try:
-                    await message.channel.send(f"Brilliant. Now head over to {message.guild.get_channel(config['channels']['name-channel']).mention} to select your country.")
+                    await message.channel.send(f"Brilliant. Now head over to {message.guild.get_channel(config['channels']['flag-channel']).mention} to select your country.")
                 except:
                     pass
             except:
