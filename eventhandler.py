@@ -154,7 +154,7 @@ class EventHandler(Cog):
         
         embed = Embed(title='Member Update', color=randint(0, 0xffffff))
         if before.status != after.status:
-            changed = "status"
+            return False
         elif before.nick != after.nick:
             changed = "nick"
         elif before.roles != after.roles:
