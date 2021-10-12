@@ -106,7 +106,7 @@ class EventHandler(Cog):
     async def on_member_remove(self, member:Member):
         join = member.guild.get_channel(config['channels']['join-logs'])
 
-        embed = Embed(title="'-'", description=f"{member} has just left the server", color=randint(0, 0xffffff))
+        embed = Embed(title="'-'", description=f"{str(member)} has just left the server", color=randint(0, 0xffffff))
         if join:
             await join.send(embed=embed)
 
@@ -116,7 +116,7 @@ class EventHandler(Cog):
     async def on_member_ban(self, member:Member):
         join = member.guild.get_channel(config['channels']['join-logs'])
 
-        embed = Embed(title="BANNED!!!", description=f"{member} with id {member.id} has been banned.")
+        embed = Embed(title="BANNED!!!", description=f"{str(member)} with id {member.id} has been banned.")
         if join:
             await join.send(embed=embed)
         
