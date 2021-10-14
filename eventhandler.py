@@ -252,7 +252,8 @@ class EventHandler(Cog):
             member (Member): The member"""
         member_count_channel = member.guild.get_channel(config['channels']['member-count'])
         if member_count_channel:
-            name = member_count_channel.name.split(": ")[0]
+            letters = [letter for letter in member_count_channel.name if letter.isalpha() or letter == " "]
+            name = ''.join(letters)
             try:
                 await member_count_channel.edit(name=f"{name}: {sum(not user.bot for user in member.guild.members)}")
             except:
