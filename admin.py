@@ -14,7 +14,7 @@ class Admin(Cog):
 
     @command(name="kick", brief="Kicks a user", help="Used to kick a user from the server", usage="@member reason")
     @has_guild_permissions(kick_members=True)
-    async def kick(self, ctx: Context, member:discord.Member, reason:str):
+    async def kick(self, ctx: Context, member:discord.Member, *, reason:str):
         try:
             await member.send(f"You have been kicked from {ctx.guild.name} by {ctx.author}. Reason: {reason}")
         except:
@@ -24,7 +24,7 @@ class Admin(Cog):
 
     @command(name="ban", brief="Bans a user from the server", help="Used to ban a user from the server", usage="@user|user_id reason")
     @has_guild_permissions(ban_members=True)
-    async def ban(self, ctx:Context, user:discord.User, reason:str):
+    async def ban(self, ctx:Context, user:discord.User, *, reason:str):
         try:
             await user.send(f"You have been banned from PCSG. Reason: {reason}")
         except:
@@ -34,7 +34,7 @@ class Admin(Cog):
 
     @command(name="mute", brief="Mutes a user from the server for a given time", help="Prevents a user from speaking in the server for a given duration.", usage="@member time_in_minutes reason")
     @has_guild_permissions(manage_messages=True)
-    async def mute(self, ctx:Context, member:discord.Member, timeout:int, reason:str):
+    async def mute(self, ctx:Context, member:discord.Member, timeout:int, *, reason:str):
         muted_role = discord.utils.get(ctx.guild.roles, name="E-Muted")
         if not muted_role:
             muted_role = await ctx.guild.create_role(name="E-Muted")
@@ -84,7 +84,7 @@ class Admin(Cog):
 
     @command(name="warn", brief="Issues a warning to a user", help="Adds +1 warn to a mentioned user. Max is 4", usage="@member reason")
     @has_guild_permissions(kick_members=True)
-    async def warn(self, ctx:Context, member:discord.Member, reason:str):
+    async def warn(self, ctx:Context, member:discord.Member, *, reason:str):
         warn_logs = ctx.guild.get_channel(config['channels']['warn-logs'])
         await db.warn_user(member.id)
         await ctx.send(f"{member.mention} has been warned by {ctx.author}. Reason: {reason}")
