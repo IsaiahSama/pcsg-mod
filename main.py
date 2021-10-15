@@ -4,7 +4,7 @@ from discord_slash import SlashCommand
 from config import config
 from os import listdir
 
-bot = Bot(command_prefix=config['constants']['prefix'], intents=Intents.all())
+bot = Bot(command_prefix=config['constants']['prefix'], intents=Intents.all(), case_insensitive=True)
 slash = SlashCommand(bot, sync_commands=False, sync_on_cog_reload=True)
 
 # Loads extensions
