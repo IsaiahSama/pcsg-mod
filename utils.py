@@ -2,10 +2,12 @@ from discord.channel import TextChannel
 from discord import Embed, Member
 from discord.ext.commands import Bot, Cog
 from discord_slash import SlashContext, cog_ext
+from discord_slash.context import ComponentContext
 from discord_slash.utils.manage_commands import create_choice, create_option
+from discord_slash.utils.manage_components import create_actionrow, create_select_option, create_select, wait_for_component
 from config import config
 from database import db
-from random import randint
+from random import randint, shuffle
 
 class Utils(Cog):
     def __init__(self, bot:Bot):
@@ -56,17 +58,84 @@ class Utils(Cog):
             await ctx.send(config['styles'][learn])
         elif choose:
             try:
-                role = config['role_styles'][choose]
+                role = config['roles'][choose]
                 await ctx.author.add_roles(role) if role not in ctx.author.roles else ctx.author.remove_roles(role)
                 await ctx.send(f"You have successfully {'gained' if role in ctx.author.roles else 'removed'} the {role.name} role")
             except KeyError:
                 await ctx.send("Sorry, we're still waiting on the roles to be created before this can work.")
         else:
             try:
-                role = config['role_styles'][choose]
+                role = config['roles'][choose]
+                similar = [member for member in ctx.guild.members if role in member.roles]
+                if not similar: await ctx.send(f"Sorry, can't find anyone with a similar learning style to {role.name}... not yet anyway :)")
+                else:
+                    await ctx.send(f"Showing all students with the {role.name} learning style.\n{', '.join([str(student) for student in similar])}")
             except KeyError:
                 await ctx.send("Sorry, we're still waiting on the roles to be created before this can work.")
 
+    # @cog_ext.cog_slash(name="matchfind", description="Used to find students who do similar subjects to you.", guild_ids=config['guild_ids'],
+    # options=[
+    #     create_option(name="criteria", description="The criteria you want to use to find your matches.", option_type=str, required=True, choices=[
+    #         create_choice(value="subject", name="By Subject"),
+    #         create_choice(value="year", name="By Year"),
+    #         create_choice(value="country", name="By Country")
+    #     ])
+    # ])
+
+    @cog_ext.cog_slash(name="matchfind", description="Used to find students who do similar subjects to you.", guild_ids=config['guild_ids'],
+    options=[
+        create_option(name="learning_style", description="Determines whether to filter by learning style.", option_type=str, required=True, choices=[create_choice(value, name) for value, name in zip([*config['styles'].keys(), "none"], [name.split("\n")[0] for name in [*config['styles'].values(), "None"]])
+        ]),
+    ])
+    async def matchfind(self, ctx:SlashContext, learning_style:str):
+        await ctx.defer()
+
+        countries = ['Anguilla', 'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Belize', 'British Virgin Islands', 'Cayman Islands', 'Dominica', 'Germany', 'Grenada', 'Guyana', 'Haiti', 'Jamaica', 'Montserrat', 'St.Kitts and Nevis', 'St.Lucia', 'St.Vincent and the Grenadines', 'Suriname', 'Trinidad and Tobago']
+
+        options = [
+            create_select_option(label="By Subject", value="subject", description="Filter by subjects"),
+            create_select_option(label="By Year", value="year", description="Filter by form level/year"),
+            create_select_option(label="By Proficiency", value="pro", description="Filter by CAPE, CSEC or PRE-CSEC"),
+            create_select_option(label="By Country", value="country", description="Filter by country"),
+        ]
+
+        select = create_select(options=options, custom_id=str(ctx.author.id), placeholder="Select criteria for match find below.", max_values=4, min_values=1)
+
+        actionrow = create_actionrow(select)
+
+        await ctx.send("Criteria Select", components=[actionrow])
+        select_ctx: ComponentContext = await wait_for_component(self.bot, components=actionrow)
+        if not select_ctx.selected_options:
+            return
+        criteria = select_ctx.selected_options
+
+        matches = ctx.guild.members
+        # Starting the filter
+
+        if "subject" in criteria:
+            student_subjects = [role for role in ctx.author.roles if role.name[0] in ["3", "4", "5", "6"]]
+            matches = [student for student in matches if any(subject in student.roles for subject in student_subjects)]
+        if "year" in criteria:
+            student_year = [role for role in ctx.author.roles if role.name.split(" ")[0] in ["Unit", "Form"]]
+            matches = [student for student in matches if any(year in student.roles for year in student_year)]
+        if "pro" in criteria:
+            student_proficieny = [role for role in ctx.author.roles if any(pro.lower() in role.name.lower() for pro in ["csec", "cape"])]
+            matches = [student for student in matches if any(pro in student.roles for pro in student_proficieny)]
+        if "country" in criteria:
+            student_country = [role for role in ctx.author.roles if role.name in countries]
+            matches = [student for student in matches if any(country in student.roles for country in student_country)]
+        if learning_style != "none":
+            role = config['roles'][learning_style]
+            matches = [student for student in matches if role in student.roles]
+        
+        await select_ctx.edit_origin(content="Done")
+        if not matches:
+            await ctx.send("Sorry, couldn't find anyone matching those criteria. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:")
+        else:
+            embed = Embed(title=f"Matchfind for {str(ctx.author)}", description=f"Found {len(matches)} in total, and showing {len(matches[:25])} students that match your criteria of {criteria}", color=randint(0, 0xffffff))
+            shuffle(matches)
+            [embed.add_field(name=f"Match {i}", value=v) for i, v in enumerate(matches[:25])]
+            await ctx.send(embed=embed)
 
 def setup(bot:Bot):
     bot.add_cog(Utils(bot))
