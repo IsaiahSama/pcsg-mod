@@ -58,14 +58,16 @@ class Utils(Cog):
             await ctx.send(config['styles'][learn])
         elif choose:
             try:
-                role = config['roles'][choose]
+                role_id = config['roles'][choose]
+                role = ctx.guild.get_role(role_id)
                 await ctx.author.add_roles(role) if role not in ctx.author.roles else ctx.author.remove_roles(role)
                 await ctx.send(f"You have successfully {'gained' if role in ctx.author.roles else 'removed'} the {role.name} role")
             except KeyError:
                 await ctx.send("Sorry, we're still waiting on the roles to be created before this can work.")
         else:
             try:
-                role = config['roles'][choose]
+                role_id = config['roles'][choose]
+                role = ctx.guild.get_role(role_id)
                 similar = [member for member in ctx.guild.members if role in member.roles]
                 if not similar: await ctx.send(f"Sorry, can't find anyone with a similar learning style to {role.name}... not yet anyway :)")
                 else:
