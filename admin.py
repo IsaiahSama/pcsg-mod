@@ -12,7 +12,7 @@ class Admin(Cog):
         self.bot = bot
         
 
-    @command(name="Kick", brief="Kicks a user", help="Used to kick a user from the server", usage="@member reason")
+    @command(name="kick", brief="Kicks a user", help="Used to kick a user from the server", usage="@member reason")
     @has_guild_permissions(kick_members=True)
     async def kick(self, ctx: Context, member:discord.Member, reason:str):
         try:
@@ -22,7 +22,7 @@ class Admin(Cog):
         await member.kick(reason=reason)
         await ctx.send(f"{member} has been kicked from the server by {ctx.author}. Reason: {reason}")
 
-    @command(name="Ban", brief="Bans a user from the server", help="Used to ban a user from the server", usage="@user|user_id reason")
+    @command(name="ban", brief="Bans a user from the server", help="Used to ban a user from the server", usage="@user|user_id reason")
     @has_guild_permissions(ban_members=True)
     async def ban(self, ctx:Context, user:discord.User, reason:str):
         try:
@@ -32,7 +32,7 @@ class Admin(Cog):
         await ctx.guild.ban(user, reason=reason)
         await ctx.send(f"{user} has been banned by {ctx.author}. Reason: {reason}")
 
-    @command(name="Mute", brief="Mutes a user from the server for a given time", help="Prevents a user from speaking in the server for a given duration.", usage="@member time_in_minutes reason")
+    @command(name="mute", brief="Mutes a user from the server for a given time", help="Prevents a user from speaking in the server for a given duration.", usage="@member time_in_minutes reason")
     @has_guild_permissions(manage_messages=True)
     async def mute(self, ctx:Context, member:discord.Member, timeout:int, reason:str):
         muted_role = discord.utils.get(ctx.guild.roles, name="E-Muted")
@@ -50,7 +50,7 @@ class Admin(Cog):
             roles = [ctx.guild.get_role(role_id) for role_id in role_ids]
             await member.edit(roles=[role for role in roles if role])
     
-    @command(name="Unmute", brief="Unmutes a muted user", help="Used to unmute someone that has been muted.", usage="@member")
+    @command(name="unmute", brief="Unmutes a muted user", help="Used to unmute someone that has been muted.", usage="@member")
     @has_guild_permissions(manage_messages=True)
     async def unmute(self, ctx:Context, member:discord.Member):
         muted_member = await db.get_and_remove_muted_user(member.id)
@@ -64,7 +64,7 @@ class Admin(Cog):
         await ctx.send(f"{member.mention} has been unmuted.")
         
     paused_channels = {}
-    @command(name="Pause", brief="Prevents all users from speaking in the current channel", help="Stops activity from within the current channel", usage="time_in_minutes")
+    @command(name="pause", brief="Prevents all users from speaking in the current channel", help="Stops activity from within the current channel", usage="time_in_minutes")
     @has_guild_permissions(manage_messages=True, manage_channels=True)
     async def pause(self, ctx: Context):
         og_overwrites = ctx.channel.overwrites
@@ -82,7 +82,7 @@ class Admin(Cog):
             del self.paused_channels[ctx.channel.id]
         await ctx.send("Not frozen.")
 
-    @command(name="Warn", brief="Issues a warning to a user", help="Adds +1 warn to a mentioned user. Max is 4", usage="@member reason")
+    @command(name="warn", brief="Issues a warning to a user", help="Adds +1 warn to a mentioned user. Max is 4", usage="@member reason")
     @has_guild_permissions(kick_members=True)
     async def warn(self, ctx:Context, member:discord.Member, reason:str):
         warn_logs = ctx.guild.get_channel(config['channels']['warn-logs'])
@@ -95,7 +95,7 @@ class Admin(Cog):
         if warn_logs:
             await warn_logs.send(f"{member} has been warned by {ctx.author}. Reason: {reason}")
 
-    @command(name="Warns", brief="Views number of warns on a user", help="Displays if a user has been warned, and the number of warns they have.", usage="@member")
+    @command(name="warns", brief="Views number of warns on a user", help="Displays if a user has been warned, and the number of warns they have.", usage="@member")
     async def warns(self, ctx:Context, member:discord.Member):
         warned = await db.get_warned_user(member.id)
         if not warned:

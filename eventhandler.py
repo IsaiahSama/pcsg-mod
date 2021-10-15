@@ -140,6 +140,10 @@ class EventHandler(Cog):
     @Cog.listener()
     async def on_raw_reaction_remove(self, payload:RawReactionActionEvent):
         await self.handle_reaction(payload)
+
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await ctx.send(error, delete_after=5)
     
     # Functions
     async def handle_changed(self, before:Member, after:Member) -> Embed:
