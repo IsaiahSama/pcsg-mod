@@ -129,7 +129,7 @@ class Utils(Cog):
             matches = [student for student in matches if any(country in student.roles for country in student_country)]
         if learning_style != "none":
             role_id = config['roles'][learning_style]
-            role = await ctx.guild.get_role(role_id)
+            role = ctx.guild.get_role(role_id)
             matches = [student for student in matches if role in student.roles]
         
         await select_ctx.edit_origin(content="Sending results now")
