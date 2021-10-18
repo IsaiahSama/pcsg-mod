@@ -132,7 +132,7 @@ class Utils(Cog):
             role = await ctx.guild.get_role(role_id)
             matches = [student for student in matches if role in student.roles]
         
-        await select_ctx.edit_origin(content="Done")
+        await select_ctx.edit_origin(content="Sending results now")
         if not matches:
             await ctx.send("Sorry, couldn't find anyone matching those criteria. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:")
         else:
