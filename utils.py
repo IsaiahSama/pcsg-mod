@@ -128,7 +128,8 @@ class Utils(Cog):
             student_country = [role for role in ctx.author.roles if role.name in countries]
             matches = [student for student in matches if any(country in student.roles for country in student_country)]
         if learning_style != "none":
-            role = config['roles'][learning_style]
+            role_id = config['roles'][learning_style]
+            role = await ctx.get.get_role(role_id)
             matches = [student for student in matches if role in student.roles]
         
         await select_ctx.edit_origin(content="Done")
