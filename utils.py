@@ -66,7 +66,7 @@ class Utils(Cog):
                 await ctx.send("Sorry, we're still waiting on the roles to be created before this can work.")
         else:
             try:
-                role_id = config['roles'][choose]
+                role_id = config['roles'][find]
                 role = ctx.guild.get_role(role_id)
                 similar = [member for member in ctx.guild.members if role in member.roles]
                 if not similar: await ctx.send(f"Sorry, can't find anyone with a similar learning style to {role.name}... not yet anyway :)")
