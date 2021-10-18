@@ -99,6 +99,7 @@ class Utils(Cog):
             create_select_option(label="By Year", value="year", description="Filter by form level/year"),
             create_select_option(label="By Proficiency", value="pro", description="Filter by CAPE, CSEC or PRE-CSEC"),
             create_select_option(label="By Country", value="country", description="Filter by country"),
+            create_select_option(label="By Learning Style", value="style", description="Filter by previously selected learning style.")
         ]
 
         select = create_select(options=options, custom_id=str(ctx.author.id), placeholder="Select criteria for match find below.", max_values=4, min_values=1)
