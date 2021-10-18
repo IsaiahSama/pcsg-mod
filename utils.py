@@ -60,7 +60,7 @@ class Utils(Cog):
             try:
                 role_id = config['roles'][choose]
                 role = ctx.guild.get_role(role_id)
-                await ctx.author.add_roles(role) if role not in ctx.author.roles else ctx.author.remove_roles(role)
+                await ctx.author.add_roles(role) if role not in ctx.author.roles else await ctx.author.remove_roles(role)
                 await ctx.send(f"You have successfully {'removed' if role in ctx.author.roles else 'gain'} the {role.name} role")
             except KeyError:
                 await ctx.send("Sorry, we're still waiting on the roles to be created before this can work.")
