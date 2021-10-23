@@ -97,7 +97,7 @@ class Utils(Cog):
         options = [
             create_select_option(label="By Subject", value="subject", description="Filter by subjects"),
             create_select_option(label="By Year", value="year", description="Filter by form level/year"),
-            create_select_option(label="By Proficiency", value="pro", description="Filter by CAPE, CSEC or PRE-CSEC"),
+            create_select_option(label="By Proficiency", value="proficiency", description="Filter by CAPE, CSEC or PRE-CSEC"),
             create_select_option(label="By Country", value="country", description="Filter by country"),
             create_select_option(label="By Learning Style", value="style", description="Filter by previously selected learning style.")
         ]
@@ -121,7 +121,7 @@ class Utils(Cog):
         if "year" in criteria:
             student_year = [role for role in ctx.author.roles if role.name.split(" ")[0] in ["Unit", "Form"]]
             matches = [student for student in matches if any(year in student.roles for year in student_year)]
-        if "pro" in criteria:
+        if "proficiency" in criteria:
             student_proficieny = [role for role in ctx.author.roles if any(pro.lower() in role.name.lower() for pro in ["csec", "cape"])]
             matches = [student for student in matches if any(pro in student.roles for pro in student_proficieny)]
         if "country" in criteria:
