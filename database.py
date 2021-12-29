@@ -19,7 +19,8 @@ class Database:
                 USER_ID INTEGER PRIMARY KEY,
                 WARN_COUNT INTEGER)""")
 
-            await db.execute("CREATE TABLE IF NOT EXISTS MonitorTable(USER_ID INTEGER PRIMARY KEY UNIQUE);")
+            await db.execute("""
+            CREATE TABLE IF NOT EXISTS MonitorTable (USER_ID INTEGER PRIMARY KEY UNIQUE)""")
 
             await db.execute("""CREATE TABLE IF NOT EXISTS LevelTable (
                 USER_ID INTEGER PRIMARY KEY UNIQUE,
