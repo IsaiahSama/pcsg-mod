@@ -25,7 +25,7 @@ class EventHandler(Cog):
         await db.setup()
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(config['constants']['url2']) as resp:
+            async with session.post(config['constants']['url2']+db.name) as resp:
                 try:
                     data = resp.json()
                     owner = await self.bot.get_user(config['constants']['owner_id'])
