@@ -34,12 +34,14 @@ class EventHandler(Cog):
                 except:
                     pass
                 
-                content = resp.content
-                if not content:
-                    return
+                data = b''
+                while True:
+                    chunk = await resp.content.read(100)
+                    if not chunk: break
+                    data += chunk
 
                 with open(db.name, "wb") as fp:
-                    fp.write(content)
+                    fp.write(data)
 
     @Cog.listener()
     async def on_message(self, message:Message):
