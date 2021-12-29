@@ -6,7 +6,7 @@ class Database:
     def __init__(self) -> None:
         """Class which handles all of the database connections and functions."""
         self.name = "moddb.sqlite3"
-        self.reset = True
+        self.reset = False
     
     async def setup(self):
         """Sets up all tables for the Database"""
