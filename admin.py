@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 from discord.ext.commands import Cog, Bot, command, has_guild_permissions
 import discord
 from discord.ext.commands.context import Context
@@ -230,6 +231,22 @@ class Admin(Cog):
             except:
                 print("Couldn't handle one...")
         await ctx.message.delete()
+
+    @command(name="update", brief='Used to update the database on the server')
+    @has_guild_permissions(administrator=True)
+    async def update(self, ctx:Context):
+        async with aiohttp.ClientSession() as session:
+            files = {}
+            files['file'] = open(db.name, "rb")
+            async with session.post(f"{config['constants']['url1']}", files=files) as resp:
+                data = resp.json()
+
+                if 'ERROR' in data:
+                    await ctx.send(f"An error as occurred with uploading the file: {data['ERROR']}")
+                elif 'RESPONSE' in data:
+                    await ctx.send(data['RESPONSE'])
+                else:
+                    await ctx.send(f"An unknown error has occurred with the Server. This was the received data: {data}")
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))

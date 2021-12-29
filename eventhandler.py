@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
 from discord import Embed, Activity, ActivityType
@@ -23,6 +24,18 @@ class EventHandler(Cog):
         await self.bot.change_presence(activity=activity)
         await db.setup()
 
+        async with aiohttp.ClientSession() as session:
+            async with session.post(config['constants']['url2']) as resp:
+                try:
+                    data = resp.json()
+                    owner = await self.bot.get_user(config['constants']['owner_id'])
+                    await owner.send(data)
+                    return
+                except:
+                    pass
+                
+                with open(db.name, "wb") as fp:
+                    fp.write(resp.text)
 
     @Cog.listener()
     async def on_message(self, message:Message):
