@@ -1,7 +1,7 @@
 ---
 
 constants:
-  prefix: "!!"
+  prefix: "p."
   key: "NzYzMDU0MTAzNTkxOTExNDc0.X3yHgw.wNfZZyzhTqqhHQdzwnWkNkkYCYI"
   owner_id: 493839592835907594
   url1: "https://pcsg-db-server.herokuapp.com/update"
