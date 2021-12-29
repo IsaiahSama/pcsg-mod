@@ -6,7 +6,7 @@ class Database:
     def __init__(self) -> None:
         """Class which handles all of the database connections and functions."""
         self.name = "moddb.sqlite3"
-        self.reset = False
+        self.reset = True
     
     async def setup(self):
         """Sets up all tables for the Database"""
@@ -15,6 +15,7 @@ class Database:
                 table_names = ["MuteTable", "WarnTable", "MonitorTable", "LevelTable", "RoleTable"]
                 for table in table_names:
                     await db.execute(f"""DROP TABLE IF EXISTS {table}""")
+                await db.commit()
                     
         async with connect(self.name) as db:
             await db.execute("""CREATE TABLE IF NOT EXISTS MuteTable(
