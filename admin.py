@@ -238,7 +238,7 @@ class Admin(Cog):
         async with aiohttp.ClientSession() as session:
             files = {}
             files['file'] = open(db.name, "rb")
-            async with session.post(f"{config['constants']['url1']}", files=files) as resp:
+            async with session.post(f"{config['constants']['url1']}", data=files) as resp:
                 data = await resp.json()
 
                 if 'ERROR' in data:
