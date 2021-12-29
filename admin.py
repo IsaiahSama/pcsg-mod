@@ -1,4 +1,5 @@
 import asyncio
+from os import path
 from requests import post
 from discord.ext.commands import Cog, Bot, command, has_guild_permissions
 import discord
@@ -235,6 +236,10 @@ class Admin(Cog):
     @command(name="update", brief='Used to update the database on the server')
     @has_guild_permissions(administrator=True)
     async def update(self, ctx:Context):
+        if not path.exists(db.name):
+            await ctx.send("Database does not exist")
+            return False
+            
         files = {}
         fp = open(db.name, "rb")
         files['file'] = fp
