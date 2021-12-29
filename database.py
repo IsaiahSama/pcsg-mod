@@ -28,7 +28,9 @@ class Database:
                 WARN_COUNT INTEGER)""")
 
             await db.execute("""
-            CREATE TABLE IF NOT EXISTS MonitorTable (USER_ID INTEGER PRIMARY KEY UNIQUE)""")
+            CREATE TABLE IF NOT EXISTS MonitorTable (
+                USER_ID INTEGER PRIMARY KEY UNIQUE
+                )""")
 
             await db.execute("""CREATE TABLE IF NOT EXISTS LevelTable (
                 USER_ID INTEGER PRIMARY KEY UNIQUE,
@@ -43,6 +45,7 @@ class Database:
                 """)
 
             await db.commit()
+            print("Completed creating of database")
 
     async def mute_user(self, user_id:int, role_ids:list):
         """Adds a muted user and their roles to the database
