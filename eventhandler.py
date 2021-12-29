@@ -20,7 +20,7 @@ class EventHandler(Cog):
     async def on_ready(self):
         await self.bot.wait_until_ready()
         print("PCSG MOD v2 IS UP AND READY!")
-        activity = Activity(name=f"{config['constants']['prefix']}MOD POWA", type=ActivityType.playing)
+        activity = Activity(name=f"{config['constants']['prefix']}Isaiah Number 1", type=ActivityType.playing)
         await self.bot.change_presence(activity=activity)
         await db.setup()
 
