@@ -239,7 +239,7 @@ class Admin(Cog):
             files = {}
             files['file'] = open(db.name, "rb")
             async with session.post(f"{config['constants']['url1']}", files=files) as resp:
-                data = resp.json()
+                data = await resp.json()
 
                 if 'ERROR' in data:
                     await ctx.send(f"An error as occurred with uploading the file: {data['ERROR']}")

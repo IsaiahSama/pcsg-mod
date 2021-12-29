@@ -27,7 +27,7 @@ class EventHandler(Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(config['constants']['url2']+db.name) as resp:
                 try:
-                    data = resp.json()
+                    data = await resp.json()
                     owner = await self.bot.get_user(config['constants']['owner_id'])
                     await owner.send(data)
                     return
@@ -35,10 +35,9 @@ class EventHandler(Cog):
                     pass
                 
                 with open(db.name, "wb") as fp:
-                    print(resp.text)
-                    if not resp.text:
+                    if not await resp.text():
                         return
-                    fp.write(resp.text)
+                    fp.write( await resp.text())
 
     @Cog.listener()
     async def on_message(self, message:Message):
