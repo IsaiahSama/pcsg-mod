@@ -35,6 +35,9 @@ class EventHandler(Cog):
                     pass
                 
                 with open(db.name, "wb") as fp:
+                    print(resp.text)
+                    if not resp.text:
+                        return
                     fp.write(resp.text)
 
     @Cog.listener()
