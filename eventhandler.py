@@ -35,6 +35,7 @@ class EventHandler(Cog):
                     pass
                 
                 data = b''
+                if resp.content.read() == b'': return False
                 while True:
                     chunk = await resp.content.read(100)
                     if not chunk: break
