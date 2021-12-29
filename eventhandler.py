@@ -35,9 +35,9 @@ class EventHandler(Cog):
                     pass
                 
                 with open(db.name, "wb") as fp:
-                    if not await resp.content():
+                    if not await resp.content:
                         return
-                    content = await resp.content()
+                    content = await resp.content
                     fp.write(content)
 
     @Cog.listener()
