@@ -34,7 +34,7 @@ class EventHandler(Cog):
                 except:
                     pass
                 
-                content = resp.content()
+                content = resp.content
                 if not content:
                     return
 
