@@ -34,10 +34,11 @@ class EventHandler(Cog):
                 except:
                     pass
                 
-                with open(db.name, "w") as fp:
-                    if not await resp.text():
+                with open(db.name, "wb") as fp:
+                    if not await resp.content():
                         return
-                    fp.write( await resp.text())
+                    content = await resp.content()
+                    fp.write(content)
 
     @Cog.listener()
     async def on_message(self, message:Message):
