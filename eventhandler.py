@@ -34,7 +34,7 @@ class EventHandler(Cog):
                 except:
                     pass
                 
-                with open(db.name, "wb") as fp:
+                with open(db.name, "w") as fp:
                     if not await resp.text():
                         return
                     fp.write( await resp.text())
