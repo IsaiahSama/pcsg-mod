@@ -273,6 +273,7 @@ class Admin(Cog):
 
         with open(db.name, "wb") as fp:
             fp.write(resp.content)
+            await ctx.send("Successfully downloaded data")
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
