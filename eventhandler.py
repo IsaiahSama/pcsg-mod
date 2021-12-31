@@ -26,26 +26,6 @@ class EventHandler(Cog):
         await self.bot.change_presence(activity=activity)
         await db.setup()
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(config['constants']['url2']+db.name) as resp:
-                try:
-                    data = await resp.json()
-                    owner = await self.bot.get_user(config['constants']['owner_id'])
-                    await owner.send(data)
-                    return
-                except:
-                    pass
-                
-                data = b''
-                if await resp.content.read() == b'': return False
-                while True:
-                    chunk = await resp.content.read(100)
-                    if not chunk: break
-                    data += chunk
-
-                with open(db.name, "wb") as fp:
-                    fp.write(data)
-                    
         self.update_db.start()
 
     @Cog.listener()

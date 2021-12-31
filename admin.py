@@ -259,6 +259,21 @@ class Admin(Cog):
         else:
             await ctx.send(f"An unknown error has occurred with the Server. This was the received data: {data}")
 
+    @command(name='download', brief="UUsed to download the database from the server")
+    @has_guild_permissions(administrator=True)
+    async def download(self, ctx:Context):
+        resp = post(config['constants']['url2']+db.name)
+        try:
+            data = resp.json()
+            owner = self.bot.get_user(config['constants']['owner_id'])
+            await owner.send(data)
+            return
+        except:
+            pass
+
+        with open(db.name, "wb") as fp:
+            fp.write(resp.content)
+
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
     
