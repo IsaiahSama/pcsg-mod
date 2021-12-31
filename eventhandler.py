@@ -102,7 +102,7 @@ class EventHandler(Cog):
         name_channel = member.guild.get_channel(config['channels']['name-channel'])
 
 
-        embed = Embed(title="!!!", description=f"{member.mention} has just joined the server", color=randint(0, 0xffffff))
+        embed = Embed(title="!!!", description=f"{member.name} / {member.id} has just joined the server", color=randint(0, 0xffffff))
         embed.add_field(name="Account Creation Date", value=member.created_at.strftime("%d/%m/%y"))
         embed.add_field(name="Joined at", value=ctime())
 
@@ -126,7 +126,7 @@ class EventHandler(Cog):
     async def on_member_remove(self, member:Member):
         join = member.guild.get_channel(config['channels']['join-logs'])
 
-        embed = Embed(title="'-'", description=f"{str(member)} has just left the server", color=randint(0, 0xffffff))
+        embed = Embed(title="...", description=f"{str(member)} has just left the server", color=randint(0, 0xffffff))
         if join:
             await join.send(embed=embed)
 
