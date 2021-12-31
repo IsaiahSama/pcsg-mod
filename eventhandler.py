@@ -186,10 +186,14 @@ class EventHandler(Cog):
         elif before.pending != after.pending:
             changed = "pending"
         else: return False
-
+        
         embed.description = f"{before.name}'s {changed} has been changed"
-        embed.add_field(name="Before:", value=getattr(before, changed)[:1000])
-        embed.add_field(name="After:", value=getattr(after, changed)[:1000])
+        if changed == "roles":
+            embed.add_field(name="Before:", value=', '.join([role.name for role in before.roles]))
+            embed.add_field(name="After:", value=', '.join([role.name for role in after.roles]))
+        else:
+            embed.add_field(name="Before:", value=getattr(before, changed)[:1000])
+            embed.add_field(name="After:", value=getattr(after, changed)[:1000])
         return embed
 
     async def moderate_message(self, message:Message) -> bool:
