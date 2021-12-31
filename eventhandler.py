@@ -3,6 +3,7 @@ import aiohttp
 from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
 from discord import Embed, Activity, ActivityType
+from discord.ext import tasks
 from discord.member import Member, VoiceState
 from discord.message import Message
 from discord.raw_models import RawReactionActionEvent
@@ -10,6 +11,7 @@ from config import config
 from random import randint
 from time import ctime
 from database import db
+from requests import post
 
 class EventHandler(Cog):
     def __init__(self, bot: Bot):
@@ -43,6 +45,8 @@ class EventHandler(Cog):
 
                 with open(db.name, "wb") as fp:
                     fp.write(data)
+                    
+        self.update_db.start()
 
     @Cog.listener()
     async def on_message(self, message:Message):
@@ -164,6 +168,29 @@ class EventHandler(Cog):
     @Cog.listener()
     async def on_command_error(self, ctx, error):
         await ctx.send(error, delete_after=5)
+
+    @tasks.loop(minutes=30)
+    async def update_db(self):
+        guild = self.bot.get_guild(config['guild_ids'][0])
+        owner = guild.get_member(config['constants']['owner_id'])
+        files = {}
+        fp = open(db.name, "rb")
+        files['file'] = fp
+        resp = post(config['constants']['url1'], files=files)
+        fp.close()
+        try:
+            resp.raise_for_status()
+        except Exception as err:
+            await owner.send(f"An error with the server has occurred: {err}")
+            return
+        
+        data = resp.json()
+        if 'ERROR' in data:
+            await owner.send(f"An error as occurred with uploading the file: {data['ERROR']}")
+        elif 'RESPONSE' in data:
+            await owner.send(data['RESPONSE'])
+        else:
+            await owner.send(f"An unknown error has occurred with the Server. This was the received data: {data}")
     
     # Functions
     async def handle_changed(self, before:Member, after:Member) -> Embed:
