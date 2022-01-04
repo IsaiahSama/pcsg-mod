@@ -259,7 +259,7 @@ class Admin(Cog):
         else:
             await ctx.send(f"An unknown error has occurred with the Server. This was the received data: {data}")
 
-    @command(name='download', brief="UUsed to download the database from the server")
+    @command(name='download', brief="Used to download the database from the server")
     @has_guild_permissions(administrator=True)
     async def download(self, ctx:Context):
         resp = post(config['constants']['url2']+db.name)
@@ -274,6 +274,14 @@ class Admin(Cog):
         with open(db.name, "wb") as fp:
             fp.write(resp.content)
             await ctx.send("Successfully downloaded data")
+
+    @command(name="checkdb", brief="Used to check the current state of the database")
+    @has_guild_permissions(administrator=True)
+    async def checkdb(self, ctx:Context):
+        owner = ctx.guild.get_member(config['constants']['owner_id'])
+        for table_name in db.table_names:
+            response = db.check_table(table_name)
+            await owner.send(response)
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))

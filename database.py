@@ -7,13 +7,13 @@ class Database:
         """Class which handles all of the database connections and functions."""
         self.name = "moddb.sqlite3"
         self.reset = False
+        self.table_names = ["MuteTable", "WarnTable", "MonitorTable", "LevelTable", "RoleTable"]
     
     async def setup(self):
         """Sets up all tables for the Database"""
         if self.reset:
             async with connect(self.name) as db:
-                table_names = ["MuteTable", "WarnTable", "MonitorTable", "LevelTable", "RoleTable"]
-                for table in table_names:
+                for table in self.table_names:
                     await db.execute(f"""DROP TABLE IF EXISTS {table}""")
                 await db.commit()
                     
@@ -222,5 +222,25 @@ class Database:
             cursor = await db.execute("SELECT * FROM RoleTable WHERE MESSAGE_ID = (?)", (message_id, ))
             results = await cursor.fetchall()
             return results
+
+    async def check_table(self, table_name:str) -> Union[Row, str]:
+        """Checks a given table within the database
+        
+        Args:
+            table_name (str): The name of the table to check
+        
+        Returns:
+            (Row, str)
+            
+        Raises:
+            OperationalError"""
+
+        try:
+            async with connect(self.name) as db:
+                cursor = await db.execute(f"SELECT * FROM {table_name}")
+                rows = cursor.fetchall()
+                return rows
+        except Exception as err:
+            return f"An error has occurred with table {table_name}. {err}"
 
 db = Database()
