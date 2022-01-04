@@ -280,7 +280,7 @@ class Admin(Cog):
     async def checkdb(self, ctx:Context):
         owner = ctx.guild.get_member(config['constants']['owner_id'])
         for table_name in db.table_names:
-            response = db.check_table(table_name)
+            response = await db.check_table(table_name)
             await owner.send(response)
 
 def setup(bot: Bot):

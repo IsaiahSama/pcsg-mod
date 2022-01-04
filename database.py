@@ -238,7 +238,7 @@ class Database:
         try:
             async with connect(self.name) as db:
                 cursor = await db.execute(f"SELECT * FROM {table_name}")
-                rows = cursor.fetchall()
+                rows = await cursor.fetchall()
                 return rows
         except Exception as err:
             return f"An error has occurred with table {table_name}. {err}"
