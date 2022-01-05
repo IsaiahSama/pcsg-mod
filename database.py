@@ -244,6 +244,26 @@ class Database:
                 rows = await cursor.fetchall()
                 return rows
         except Exception as err:
-            return f"An error has occurred with table {table_name}. {err}"
+            return f"An error has occurred with table {table_name} in database {name}. {err}"
+
+    async def update_database(self):
+        """Used to update the database from the temporary database file downloaded from the server
+
+        Returns: 
+            str
+        """
+
+        for table_name in self.table_names:
+            for state in [True, False]:
+                msg = self.check_table(table_name, state)
+                if isinstance(msg, str): return "Cancelling update. " + msg
+
+        with open("temp"+self.name, "rb") as tempdb:
+            temp_data = tempdb.read()
+
+        with open(self.name, "wb") as current_db:
+            current_db.write(temp_data)
+
+        return "Update was successful"       
 
 db = Database()
