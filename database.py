@@ -223,11 +223,12 @@ class Database:
             results = await cursor.fetchall()
             return results
 
-    async def check_table(self, table_name:str) -> Union[Row, str]:
+    async def check_table(self, table_name:str, temp:bool) -> Union[Row, str]:
         """Checks a given table within the database
         
         Args:
             table_name (str): The name of the table to check
+            temp (bool): Whether to check the og table or the temporary one
         
         Returns:
             (Row, str)
@@ -235,8 +236,10 @@ class Database:
         Raises:
             OperationalError"""
 
+        name = "temp" + self.name if temp else self.name
+
         try:
-            async with connect(self.name) as db:
+            async with connect(name) as db:
                 cursor = await db.execute(f"SELECT * FROM {table_name}")
                 rows = await cursor.fetchall()
                 return rows

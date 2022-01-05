@@ -271,17 +271,24 @@ class Admin(Cog):
         except:
             pass
 
-        with open(db.name, "wb") as fp:
+        with open("temp"+db.name, "wb") as fp:
             fp.write(resp.content)
             await ctx.send("Successfully downloaded data")
+        await ctx.send("Verifying data")
+        self.checkdb(ctx, temp=True)
 
     @command(name="checkdb", brief="Used to check the current state of the database")
     @has_guild_permissions(administrator=True)
-    async def checkdb(self, ctx:Context):
+    async def checkdb(self, ctx:Context, temp=False):
         owner = ctx.guild.get_member(config['constants']['owner_id'])
         for table_name in db.table_names:
-            response = await db.check_table(table_name)
+            response = await db.check_table(table_name, temp)
             await owner.send(response)
+
+    @command(name='updatedb', brief="Used to update the db from the temporary file")
+    @has_guild_permissions(administrator=True)
+    async def updatedb(self, ctx:Context):
+        response = db.update_database()
 
 def setup(bot: Bot):
     bot.add_cog(Admin(bot))
