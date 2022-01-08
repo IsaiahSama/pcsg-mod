@@ -142,7 +142,7 @@ class Utils(Cog):
         
         await select_ctx.edit_origin(content="Sending results now")
         if not matches:
-            await ctx.send(f"After searching long and hard, I can't seem to find any suitable matches for you. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:\nYour Criteria: {chosen}")
+            await ctx.send(f"After searching long and hard, I can't seem to find any suitable matches for you. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:\nYour Criteria:\n{chosen}")
         else:
             embed = Embed(title=f"Matchfind for {str(ctx.author)}", description=f"Found {len(matches)} in total, and showing {len(matches[:25])} students that match your criteria of {criteria}", color=randint(0, 0xffffff))
             shuffle(matches)
