@@ -111,6 +111,7 @@ class Utils(Cog):
         if not select_ctx.selected_options:
             return
         criteria = select_ctx.selected_options
+        chosen = []
 
         matches = ctx.guild.members
         # Starting the filter
@@ -118,23 +119,30 @@ class Utils(Cog):
         if "subject" in criteria:
             student_subjects = [role for role in ctx.author.roles if role.name[0] in ["3", "4", "5", "6"]]
             matches = [student for student in matches if any(subject in student.roles for subject in student_subjects)]
+            chosen.append(f"subject: {student_subjects}")
         if "year" in criteria:
             student_year = [role for role in ctx.author.roles if role.name.split(" ")[0] in ["Unit", "Form"]]
             matches = [student for student in matches if any(year in student.roles for year in student_year)]
+            chosen.append(f"Year: {student_year}")
         if "proficiency" in criteria:
             student_proficieny = [role for role in ctx.author.roles if any(pro.lower() in role.name.lower() for pro in ["csec", "cape"])]
             matches = [student for student in matches if any(pro in student.roles for pro in student_proficieny)]
+            chosen.append(f"Proficiency: {student_proficieny}")
         if "country" in criteria:
             student_country = [role for role in ctx.author.roles if role.name in countries]
             matches = [student for student in matches if any(country in student.roles for country in student_country)]
+            chosen.append(f"Country: {student_country}")
         if learning_style != "none":
             role_id = config['roles'][learning_style]
             role = ctx.guild.get_role(role_id)
             matches = [student for student in matches if role in student.roles]
+            chosen.append(f"Learning Style: {learning_style}")
+
+        if chosen: chosen = '\n'.join(chosen)
         
         await select_ctx.edit_origin(content="Sending results now")
         if not matches:
-            await ctx.send("Sorry, couldn't find anyone matching those criteria. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:")
+            await ctx.send(f"After searching long and hard, I can't seem to find any suitable matches for you. Make sure that you have your roles selected, or try changing your criteria :sweat_smile:\nYour Criteria: {chosen}")
         else:
             embed = Embed(title=f"Matchfind for {str(ctx.author)}", description=f"Found {len(matches)} in total, and showing {len(matches[:25])} students that match your criteria of {criteria}", color=randint(0, 0xffffff))
             shuffle(matches)
