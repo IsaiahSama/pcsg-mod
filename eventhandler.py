@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from discord.channel import TextChannel, Channel
+from discord.channel import TextChannel
 from discord.ext.commands import Cog, Bot
 from discord import Embed, Activity, ActivityType, AuditLogAction, AuditLogEntry
 from discord.ext import tasks
@@ -138,7 +138,7 @@ class EventHandler(Cog):
             await vc_member_count.edit(name=f"{vc_member_count.name.split(': ')[0]}: {sum(len(vc2.members) for vc2 in [vc for vc in member.guild.voice_channels if vc.members])}")
 
     @Cog.listener()
-    async def on_guild_channel_delete(self, channel:Channel):
+    async def on_guild_channel_delete(self, channel):
         guild = self.bot.get_guild(config['guild_ids'][0])
         last_entry = await self.get_last_entry(action=AuditLogAction.channel_delete)
         user = last_entry.user
