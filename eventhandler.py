@@ -1,8 +1,8 @@
 import asyncio
 import aiohttp
-from discord.channel import TextChannel
+from discord.channel import TextChannel, Channel
 from discord.ext.commands import Cog, Bot
-from discord import Embed, Activity, ActivityType
+from discord import Embed, Activity, ActivityType, AuditLogAction, AuditLogEntry
 from discord.ext import tasks
 from discord.member import Member, VoiceState
 from discord.message import Message
@@ -136,6 +136,21 @@ class EventHandler(Cog):
         vc_member_count = member.guild.get_channel(config['channels']['vc-count'])
         if vc_member_count:
             await vc_member_count.edit(name=f"{vc_member_count.name.split(': ')[0]}: {sum(len(vc2.members) for vc2 in [vc for vc in member.guild.voice_channels if vc.members])}")
+
+    @Cog.listener()
+    async def on_guild_channel_delete(self, channel:Channel):
+        guild = self.bot.get_guild(config['guild_ids'][0])
+        last_entry = await self.get_last_entry(action=AuditLogAction.channel_delete)
+        user = last_entry.user
+        message = f"{str(user)} has deleted the channel {channel.name} from PCSG"
+        if user.id not in config['moderators']:
+            message += " This action is unauthorized. Applying a ban to them."
+            try:
+                await user.send("You've been had... "+ message)
+            except:
+                pass
+            await guild.ban(user, reason="Performed an illegal administator action")
+        await self.alert(message)
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload:RawReactionActionEvent):
@@ -293,6 +308,31 @@ class EventHandler(Cog):
                 await member_count_channel.edit(name=f"{name}: {sum(not user.bot for user in member.guild.members)}")
             except:
                 pass
+
+    async def alert(self, message:str):
+        """Used to send an alert to the guild owner and bot developer
+        
+        Args:
+            message (str): The message to send"""
+        
+        guild = self.bot.get_guild(config['guild_ids'][0])
+        me = guild.get_member(config['constants']['owner_id'])
+        await me.send(message)
+        await guild.owner.send(message)
+        
+    async def get_last_entry(self, action:AuditLogAction, guild_id:int=config['guild_ids'][0]):
+        """Gets the last entry from the AuditLog, that matches a given action
+        
+        Args:
+            action (AuditLogAction): The action to check for
+            guild_id (int): The id of the guild to check. Defaults to PCSG
+        
+        Returns:
+            AuditLogEntry"""
+
+        guild = self.bot.get_guild(guild_id)
+        last_entry = await guild.audit_logs(limit=1, action=action).flatten()
+        return last_entry
 
 def setup(bot: Bot):
     bot.add_cog(EventHandler(bot))
