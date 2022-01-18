@@ -122,7 +122,7 @@ class Database:
                 return False
         else:
             async with connect(self.name) as db:
-                await db.execute("INSERT OR REPLACE INTO MonitorTable USER_ID VALUES (?)", (user_id, ))
+                await db.execute("INSERT OR REPLACE INTO MonitorTable (USER_ID) VALUES (?)", (user_id, ))
                 await db.commit()
                 return True
 
