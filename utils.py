@@ -116,22 +116,24 @@ class Utils(Cog):
         matches = ctx.guild.members
         # Starting the filter
 
+        missing_message = "You do not have a role from this category."
+
         if "subject" in criteria:
             student_subjects = [role for role in ctx.author.roles if role.name[0] in ["3", "4", "5", "6"]]
             matches = [student for student in matches if any(subject in student.roles for subject in student_subjects)]
-            chosen.append(f"subject: {[role.name for role in student_subjects] or 'Not Selected'}")
+            chosen.append(f"subject: {[role.name for role in student_subjects] or missing_message}")
         if "year" in criteria:
             student_year = [role for role in ctx.author.roles if role.name.split(" ")[0] in ["Unit", "Form"]]
             matches = [student for student in matches if any(year in student.roles for year in student_year)]
-            chosen.append(f"Year: {[role.name for role in student_year] or 'Not Selected'}")
+            chosen.append(f"Year: {[role.name for role in student_year] or missing_message}")
         if "proficiency" in criteria:
             student_proficieny = [role for role in ctx.author.roles if any(pro.lower() in role.name.lower() for pro in ["csec", "cape"])]
             matches = [student for student in matches if any(pro in student.roles for pro in student_proficieny)]
-            chosen.append(f"Proficiency: {[role.name for role in student_proficieny] or 'Not Selected'}")
+            chosen.append(f"Proficiency: {[role.name for role in student_proficieny] or missing_message}")
         if "country" in criteria:
             student_country = [role for role in ctx.author.roles if role.name in countries]
             matches = [student for student in matches if any(country in student.roles for country in student_country)]
-            chosen.append(f"Country: {[role.name for role in student_country] or 'Not Selected'}")
+            chosen.append(f"Country: {[role.name for role in student_country] or missing_message}")
         if learning_style != "none":
             role_id = config['roles'][learning_style]
             role = ctx.guild.get_role(role_id)
