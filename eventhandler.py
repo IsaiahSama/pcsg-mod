@@ -164,7 +164,7 @@ class EventHandler(Cog):
     async def on_command_error(self, ctx, error):
         await ctx.send(error, delete_after=5)
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(hours=10)
     async def update_db(self):
         guild = self.bot.get_guild(config['guild_ids'][0])
         owner = guild.get_member(config['constants']['owner_id'])
