@@ -140,7 +140,12 @@ class Utils(Cog):
             matches = [student for student in matches if role in student.roles]
             chosen.append(f"Learning Style: {learning_style}")
 
-        if chosen: chosen = '\n'.join(chosen)
+        if chosen: chosen = '\n'.join([message for message in chosen if message != missing_message])
+
+        missing = [message for message in chosen if message == missing_message]
+        if missing: 
+            missing = '\n'.join(missing)
+            chosen += "---------------------\nWhat you were missing that caused me to fail are listed below:\n" + missing
         
         await select_ctx.edit_origin(content="Sending results now")
         if not matches:
